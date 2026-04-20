@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AirCounsel — Pre-Qualification Engine for UK Immigration Firms</title>
+  <meta name="description" content="AirCounsel filters enquiries before they reach a solicitor. Built in Leeds for high-volume UK immigration teams." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── RESET & BASE ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:         #0d1b2a;
+      --navy-mid:     #162032;
+      --navy-light:   #1e2d40;
+      --white:        #f8f7f4;
+      --off-white:    #edebe4;
+      --cream:        #e8e3d8;
+      --gold:         #b89a5a;
+      --gold-light:   #d4b97a;
+      --gold-dim:     rgba(184,154,90,0.1);
+      --text:         #1c2432;
+      --text-mid:     #3d4a5c;
+      --text-muted:   #6b7585;
+      --text-subtle:  #9aa0aa;
+      --border:       #dbd7ce;
+      --border-light: #ede9e1;
+      --ff-display:   'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+      --ff-body:      'DM Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      --max:          1080px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--white);
+      color: var(--text);
+      font-family: var(--ff-body);
+      font-weight: 300;
+      font-size: 1rem;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ─── TYPOGRAPHY ─────────────────────────────────────────────── */
+    .display {
+      font-family: var(--ff-display);
+      font-weight: 300;
+      line-height: 1.08;
+      letter-spacing: -0.01em;
+    }
+
+    h1.display { font-size: clamp(3rem, 7vw, 6rem); }
+    h2.display { font-size: clamp(2.2rem, 4.5vw, 3.8rem); }
+    h3.display { font-size: clamp(1.5rem, 2.5vw, 2.2rem); }
+
+    .label {
+      font-family: var(--ff-body);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    p { max-width: 58ch; }
+    p.wide { max-width: 72ch; }
+
+    /* ─── LAYOUT ─────────────────────────────────────────────────── */
+    .container {
+      width: 100%;
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .rule {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    section { padding: 8rem 0; }
+
+    /* ─── ANIMATIONS ─────────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes linePulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.8; }
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1);
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+    .fade-up.delay-1 { transition-delay: 0.15s; }
+    .fade-up.delay-2 { transition-delay: 0.30s; }
+    .fade-up.delay-3 { transition-delay: 0.45s; }
+
+    /* ─── VIDEO / GIF PLACEHOLDERS ───────────────────────────────── */
+    .video-placeholder {
+      position: relative;
+      background: var(--cream);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .video-placeholder::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        45deg, transparent, transparent 20px,
+        rgba(184,154,90,0.03) 20px, rgba(184,154,90,0.03) 21px
+      );
+    }
+    .video-placeholder-inner {
+      text-align: center;
+      z-index: 1;
+      padding: 2rem;
+    }
+    .video-placeholder-inner .icon {
+      width: 48px; height: 48px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      color: var(--gold);
+    }
+    .video-placeholder-inner .icon svg {
+      width: 18px; height: 18px; fill: var(--gold); margin-left: 2px;
+    }
+    .video-placeholder-inner p {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      max-width: none;
+    }
+    .video-placeholder-inner span {
+      display: block;
+      font-family: var(--ff-display);
+      font-size: 0.95rem;
+      font-weight: 300;
+      color: var(--text-subtle);
+      margin-top: 0.4rem;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    /* ─── BUTTONS ────────────────────────────────────────────────── */
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      font-family: var(--ff-body);
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.95rem 2.2rem;
+      transition: background 0.25s, color 0.25s, border-color 0.25s, transform 0.2s;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .btn-primary {
+      background: var(--gold);
+      color: var(--navy);
+      border-color: var(--gold);
+    }
+    .btn-primary:hover {
+      background: var(--gold-light);
+      border-color: var(--gold-light);
+      transform: translateY(-1px);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border-color: var(--border);
+    }
+    .btn-ghost:hover {
+      color: var(--text);
+      border-color: var(--text-mid);
+    }
+    .btn-engine {
+      background: transparent;
+      color: var(--text-subtle);
+      border: 1px solid var(--border);
+      font-size: 0.72rem;
+    }
+    .btn-engine:hover {
+      color: var(--text-muted);
+      border-color: var(--text-muted);
+    }
+    .cta-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    /* ─── NAV ────────────────────────────────────────────────────── */
+    #site-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.4rem 0;
+      background: rgba(13,27,42,0.97);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.3s, background 0.3s;
+    }
+    #site-header.scrolled {
+      border-bottom-color: rgba(184,154,90,0.15);
+      backdrop-filter: blur(12px);
+    }
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+    .nav-logo {
+      font-family: var(--ff-display);
+      font-size: 1.35rem;
+      font-weight: 500;
+      color: var(--white);
+      text-decoration: none;
+      letter-spacing: 0.03em;
+    }
+    .nav-logo span { color: var(--gold); }
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 2.5rem;
+      align-items: center;
+    }
+    .nav-links a {
+      font-size: 0.78rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(248,247,244,0.5);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: rgba(248,247,244,0.9); }
+    .nav-cta {
+      color: var(--gold) !important;
+      border: 1px solid rgba(184,154,90,0.35) !important;
+      padding: 0.5rem 1.2rem;
+      font-size: 0.73rem !important;
+      transition: border-color 0.2s, background 0.2s !important;
+    }
+    .nav-cta:hover {
+      background: var(--gold-dim) !important;
+      border-color: var(--gold) !important;
+    }
+
+    /* ─── HERO ───────────────────────────────────────────────────── */
+    #hero {
+      position: relative; /* containing block for all absolute children */
+      min-height: 100vh;
+      background: var(--navy);
+      display: flex;
+      align-items: center;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    /* FIX: hero-bg was missing CSS entirely */
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    /* Animated background lines */
+    .hero-bg-lines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .hero-bg-lines::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      width: 1px; height: 100%;
+      background: linear-gradient(to bottom, transparent 0%, rgba(184,154,90,0.12) 40%, rgba(184,154,90,0.12) 60%, transparent 100%);
+      animation: linePulse 5s ease-in-out infinite;
+    }
+    .hero-bg-lines::after {
+      content: '';
+      position: absolute;
+      top: 40%; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(184,154,90,0.08), transparent);
+    }
+
+    /* Video placeholder bg */
+    .hero-video-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, #0d1b2a 0%, #162032 50%, #0d1b2a 100%);
+    }
+    .hero-video-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg,
+        rgba(13,27,42,0.4) 0%,
+        rgba(13,27,42,0.1) 40%,
+        rgba(13,27,42,0.6) 75%,
+        rgba(13,27,42,0.98) 100%
+      );
+    }
+    .hero-video-label {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      text-align: center;
+      pointer-events: none;
+    }
+    .hero-video-label p {
+      font-size: 0.62rem;
+      color: rgba(248,247,244,0.12);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      max-width: none;
+    }
+    .hero-video-label span {
+      display: block;
+      font-family: var(--ff-display);
+      font-size: 0.9rem;
+      color: rgba(248,247,244,0.07);
+      margin-top: 0.3rem;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 10rem 0 6rem;
+      width: 100%;
+      text-align: center; /* FIX: center all hero text */
+    }
+    .hero-content .label { margin-bottom: 2.5rem; display: block; }
+    .hero-content h1 {
+      color: var(--white);
+      margin-bottom: 1.8rem;
+    }
+    .hero-content h1 em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+    .hero-content .sub {
+      font-family: var(--ff-display);
+      font-size: clamp(1.1rem, 2vw, 1.55rem);
+      font-weight: 300;
+      font-style: italic;
+      color: rgba(248,247,244,0.5);
+      max-width: 52ch;
+      line-height: 1.45;
+      margin: 0 auto 3.5rem; /* FIX: auto margins center the capped paragraph */
+    }
+    .hero-content .cta-group { justify-content: center; }
+
+    /* BORROWED: scroll indicator from old version */
+    .hero-scroll {
+      position: absolute;
+      bottom: 3rem;
+      left: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      color: rgba(248,247,244,0.25);
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      z-index: 2;
+    }
+    .hero-scroll::before {
+      content: '';
+      display: block;
+      width: 40px; height: 1px;
+      background: rgba(184,154,90,0.3);
+    }
+
+    /* ─── PATTERN BREAK ──────────────────────────────────────────── */
+    #pattern-break {
+      padding: 0;
+      background: var(--off-white);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .pattern-break-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 480px;
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 2rem; /* FIX: consistent padding with container */
+    }
+    .pattern-break-text {
+      padding: 6rem 4rem 6rem 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .pattern-break-text h2 {
+      font-family: var(--ff-display);
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      font-weight: 300;
+      line-height: 1.15;
+      color: var(--navy);
+      margin-top: 1.5rem;
+    }
+    .pattern-break-text h2 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+    .pattern-break-text p {
+      margin-top: 1.5rem;
+      font-size: 0.95rem;
+      color: var(--text-mid);
+      line-height: 1.8;
+    }
+    .pattern-break-video {
+      border-left: 1px solid var(--border);
+    }
+    .pattern-break-video .video-placeholder {
+      height: 100%;
+      min-height: 320px;
+      border: none;
+      background: var(--cream);
+    }
+
+    /* ─── PROBLEM ────────────────────────────────────────────────── */
+    #problem {
+      background: var(--white);
+    }
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: start;
+    }
+    .problem-grid .label { margin-bottom: 1.2rem; display: block; }
+    .problem-grid h2 {
+      color: var(--navy);
+      margin-bottom: 0.5rem;
+    }
+
+    /* BORROWED: em dash list style from old version */
+    .problem-list {
+      list-style: none;
+      margin: 2.5rem 0 3rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .problem-list li {
+      display: flex;
+      align-items: baseline;
+      gap: 1.2rem;
+      padding: 1.2rem 0;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 0.98rem;
+      color: var(--text-mid);
+      font-weight: 300;
+    }
+    .problem-list li:first-child { border-top: 1px solid var(--border-light); }
+    .problem-list li::before {
+      content: '—';
+      color: var(--gold);
+      flex-shrink: 0;
+      font-family: var(--ff-display);
+      font-size: 1.1rem;
+    }
+
+    /* BORROWED: stat-block with gold left bar pseudo-element */
+    .stat-block {
+      background: var(--off-white);
+      border: 1px solid var(--border);
+      padding: 3rem;
+      position: sticky; /* FIX: removed duplicate position: relative */
+      top: 6rem;
+    }
+    .stat-block::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: var(--gold);
+    }
+    .stat-number {
+      font-family: var(--ff-display);
+      font-size: clamp(3rem, 6vw, 5rem);
+      font-weight: 300;
+      line-height: 1;
+      color: var(--navy);
+      margin: 0.5rem 0 0.8rem;
+    }
+    .stat-desc {
+      font-size: 0.88rem;
+      color: var(--text-mid);
+      max-width: 32ch;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    .stat-source {
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      margin-top: 1.5rem;
+    }
+
+    /* ─── SOLUTION ───────────────────────────────────────────────── */
+    #solution {
+      background: var(--off-white);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .solution-intro {
+      max-width: 60ch;
+      margin-bottom: 5rem;
+    }
+    .solution-intro .label { margin-bottom: 1.2rem; display: block; }
+    .solution-intro h2 { color: var(--navy); }
+    .solution-intro p {
+      font-size: 1.05rem;
+      color: var(--text-mid);
+      margin-top: 1.5rem;
+      line-height: 1.8;
+    }
+    .pillars {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border: 1px solid var(--border);
+      margin-bottom: 4rem;
+      background: var(--white);
+    }
+    .pillar {
+      padding: 2.8rem 2.4rem;
+      border-right: 1px solid var(--border);
+      position: relative;
+      transition: background 0.3s;
+    }
+    .pillar:last-child { border-right: none; }
+    .pillar:hover { background: #faf9f6; }
+    .pillar-number {
+      font-family: var(--ff-display);
+      font-size: 3.5rem;
+      font-weight: 300;
+      color: rgba(184,154,90,0.18);
+      line-height: 1;
+      margin-bottom: 1.2rem;
+    }
+    .pillar h3 {
+      font-family: var(--ff-display);
+      font-size: 1.35rem;
+      font-weight: 400;
+      color: var(--navy);
+      line-height: 1.2;
+      margin-bottom: 0.8rem;
+    }
+    .pillar p {
+      font-size: 0.88rem;
+      color: var(--text-mid);
+      max-width: 28ch;
+    }
+    .pillar-accent {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 2px;
+      background: var(--gold);
+      transition: width 0.4s ease;
+    }
+    .pillar:hover .pillar-accent { width: 100%; }
+
+    .solution-gif {
+      display: block; /* FIX: explicit block for reliable aspect-ratio across browsers */
+      aspect-ratio: 16/7;
+    }
+    .solution-gif .video-placeholder {
+      width: 100%; height: 100%;
+      border-color: var(--border);
+    }
+
+    /* ─── HOW IT WORKS ───────────────────────────────────────────── */
+    #how-it-works { background: var(--white); }
+    .steps-header {
+      margin-bottom: 5rem;
+    }
+    .steps-header .label { margin-bottom: 1rem; display: block; }
+    .steps-header h2 { color: var(--navy); }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      position: relative;
+      gap: 0;
+    }
+
+    /* BORROWED: gradient connecting line from old version */
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 0.9rem;
+      left: calc(100% / 6);
+      right: calc(100% / 6);
+      height: 1px;
+      background: linear-gradient(to right, var(--border), var(--gold), var(--border));
+      z-index: 0;
+    }
+    .step {
+      padding: 0 2rem 3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* BORROWED: square dot architecture from old version */
+    .step-dot {
+      width: 12px; height: 12px;
+      border: 1px solid var(--gold);
+      background: var(--white);
+      margin: 0 auto 2rem;
+      position: relative;
+      z-index: 2;
+    }
+    .step-dot::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 4px; height: 4px;
+      background: var(--gold);
+    }
+    .step-number {
+      font-family: var(--ff-display);
+      font-size: 0.75rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      margin-bottom: 0.6rem;
+      text-align: center;
+    }
+    .step h3 {
+      font-family: var(--ff-display);
+      font-size: 1.55rem;
+      font-weight: 400;
+      color: var(--navy);
+      text-align: center;
+      margin-bottom: 0.8rem;
+    }
+    .step p {
+      font-size: 0.9rem;
+      color: var(--text-mid);
+      text-align: center;
+      max-width: none;
+    }
+    .hiw-cta {
+      margin-top: 4.5rem;
+      text-align: center;
+    }
+    .hiw-cta p {
+      font-size: 0.78rem;
+      color: var(--text-subtle);
+      margin-top: 1.2rem;
+      max-width: none;
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── TRUST ──────────────────────────────────────────────────── */
+    #trust {
+      background: var(--off-white);
+      border-top: 1px solid var(--border);
+    }
+    .trust-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: start;
+    }
+    .trust-copy .label { margin-bottom: 1rem; display: block; }
+    .trust-copy h2 { color: var(--navy); }
+    .trust-copy p {
+      font-size: 1.02rem;
+      color: var(--text-mid);
+      margin-top: 1.5rem;
+      max-width: 50ch;
+      line-height: 1.8;
+    }
+
+    .trust-right {
+      background: var(--navy);
+      padding: 3.5rem;
+      position: relative;
+    }
+    .trust-right::before {
+      content: '"';
+      font-family: var(--ff-display);
+      font-size: 8rem;
+      color: rgba(184,154,90,0.08);
+      position: absolute;
+      top: -1.5rem; left: 2rem;
+      line-height: 1;
+      pointer-events: none;
+    }
+    .trust-quote {
+      font-family: var(--ff-display);
+      font-size: 1.35rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--white);
+      line-height: 1.6;
+      margin-bottom: 2.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .trust-attribution {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(184,154,90,0.2);
+    }
+
+    .trust-points {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      margin-top: 2rem;
+    }
+    .trust-points li {
+      display: flex;
+      align-items: center;
+      gap: 1.4rem;
+      padding: 1.2rem 0;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 0.92rem;
+      color: var(--text-mid);
+    }
+    .trust-points li:first-child { border-top: 1px solid var(--border-light); }
+    .trust-tick {
+      width: 20px; height: 20px;
+      border: 1px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .trust-tick svg {
+      width: 10px; height: 10px;
+      stroke: var(--gold);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ─── ENGINE PREVIEW (BORROWED: opacity fade trick) ──────────── */
+    #engine-preview {
+      padding: 5rem 0;
+      background: var(--navy);
+      border-top: 1px solid rgba(184,154,90,0.1);
+    }
+    .engine-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 3rem;
+      flex-wrap: wrap;
+      opacity: 0.5;
+      transition: opacity 0.4s;
+    }
+    .engine-inner:hover { opacity: 0.8; }
+    .engine-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(184,154,90,0.4);
+      margin-bottom: 0.75rem;
+      font-family: var(--ff-body);
+      font-weight: 500;
+    }
+    .engine-text h2 {
+      font-family: var(--ff-display);
+      font-size: 1.55rem;
+      font-weight: 300;
+      color: rgba(248,247,244,0.55);
+      margin-bottom: 0.6rem;
+    }
+    .engine-text p {
+      font-size: 0.87rem;
+      color: rgba(248,247,244,0.3);
+      max-width: 50ch;
+      line-height: 1.7;
+    }
+
+    /* ─── SOCIAL PROOF ───────────────────────────────────────────── */
+    #social-proof {
+      padding: 4rem 0;
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .proof-strip {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      gap: 0;
+    }
+    .proof-item {
+      flex: 1;
+      padding: 1.5rem 2.5rem;
+      border-right: 1px solid var(--border);
+      text-align: center;
+    }
+    .proof-item:last-child { border-right: none; }
+    .proof-item p {
+      font-family: var(--ff-display);
+      font-size: 1.08rem;
+      font-weight: 400;
+      color: var(--navy);
+      max-width: none;
+      line-height: 1.5;
+    }
+    .proof-item span {
+      display: block;
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-subtle);
+      margin-top: 0.4rem;
+    }
+
+    /* ─── FINAL CTA ──────────────────────────────────────────────── */
+    #cta-final {
+      background: var(--gold);
+      position: relative;
+      overflow: hidden;
+    }
+    #cta-final::before {
+      content: 'AC';
+      position: absolute;
+      font-family: var(--ff-display);
+      font-size: 22rem;
+      font-weight: 600;
+      color: rgba(13,27,42,0.05);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      letter-spacing: -0.05em;
+      line-height: 1;
+    }
+    .cta-final-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 660px;
+      text-align: center;
+      margin: 0 auto;
+    }
+    .cta-divider {
+      width: 40px; height: 1px;
+      background: rgba(13,27,42,0.25);
+      margin: 0 auto 2.5rem;
+    }
+    .cta-final-inner .label {
+      color: rgba(13,27,42,0.45);
+      margin-bottom: 1.25rem;
+      display: block;
+    }
+    .cta-final-inner h2 {
+      color: var(--navy);
+      margin-bottom: 1.5rem;
+    }
+    .cta-final-inner p {
+      font-size: 0.92rem;
+      color: rgba(13,27,42,0.6);
+      max-width: none;
+      margin-bottom: 2.5rem;
+      line-height: 1.8;
+    }
+    .cta-final-inner .cta-group { justify-content: center; }
+    .btn-navy {
+      background: var(--navy);
+      color: var(--white);
+      border-color: var(--navy);
+    }
+    .btn-navy:hover {
+      background: var(--navy-light);
+      border-color: var(--navy-light);
+      transform: translateY(-1px);
+    }
+    .btn-ghost-cta {
+      background: transparent;
+      color: var(--navy);
+      border-color: rgba(13,27,42,0.3);
+    }
+    .btn-ghost-cta:hover {
+      border-color: var(--navy);
+      background: rgba(13,27,42,0.06);
+    }
+
+    /* ─── FOOTER ─────────────────────────────────────────────────── */
+    footer {
+      background: var(--navy);
+      padding: 4rem 0 2.5rem;
+      border-top: 1px solid rgba(184,154,90,0.12);
+    }
+    .footer-inner {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 4rem;
+      padding-bottom: 3rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 2rem;
+    }
+    .footer-brand .logo {
+      font-family: var(--ff-display);
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .footer-brand .logo span { color: var(--gold); }
+    .footer-brand .tagline {
+      font-size: 0.8rem;
+      color: rgba(248,247,244,0.28);
+      font-style: italic;
+      font-family: var(--ff-display);
+      margin: 0.4rem 0 1.2rem;
+    }
+    .footer-brand p {
+      font-size: 0.8rem;
+      color: rgba(248,247,244,0.28);
+      line-height: 1.7;
+      max-width: 280px;
+    }
+    .footer-col h4 {
+      font-size: 0.67rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+    .footer-col ul a {
+      font-size: 0.83rem;
+      color: rgba(248,247,244,0.38);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-col ul a:hover { color: var(--gold-light); }
+    .footer-engine-link {
+      color: rgba(184,154,90,0.45) !important;
+      font-style: italic;
+      font-size: 0.78rem !important;
+      padding-top: 0.5rem;
+      margin-top: 0.25rem;
+      border-top: 1px solid rgba(184,154,90,0.1);
+    }
+    .footer-engine-link:hover { color: var(--gold) !important; }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .footer-bottom p {
+      font-size: 0.72rem;
+      color: rgba(248,247,244,0.18);
+      max-width: none;
+    }
+    /* BORROWED: Legal disclaimer from old version footer */
+    .footer-disclaimer {
+      font-size: 0.7rem !important;
+      color: rgba(184,154,90,0.3) !important;
+      font-style: italic;
+      text-align: right;
+    }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      nav .nav-links { display: none; }
+      #site-header { padding: 1.2rem 0; }
+
+      .pattern-break-inner,
+      .problem-grid,
+      .trust-grid,
+      .footer-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+
+      .pattern-break-text { padding: 4rem 2rem; }
+      .pattern-break-video { border-left: none; border-top: 1px solid var(--border); }
+
+      .pillars, .steps { grid-template-columns: 1fr; }
+      .pillar { border-right: none; border-bottom: 1px solid var(--border); }
+      .step { padding: 0 0 2.5rem; text-align: left; }
+      .step-dot { margin: 0 0 1.5rem; }
+      .step-number, .step h3, .step p { text-align: left; }
+      .steps::before { display: none; }
+
+      .proof-strip { flex-direction: column; }
+      .proof-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .proof-item:last-child { border-bottom: none; }
+
+      .stat-block { position: static; }
+      section { padding: 5rem 0; }
+
+      .hero-content { padding: 8rem 0 5rem; }
+      .engine-inner { flex-direction: column; align-items: flex-start; }
+      .footer-bottom { flex-direction: column; }
+      .footer-disclaimer { text-align: left !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAVIGATION ══════════════════════════════════════════════════ -->
+<header id="site-header" role="banner">
+  <div class="container">
+    <nav role="navigation" aria-label="Primary navigation">
+      <a href="/" class="nav-logo" aria-label="AirCounsel home">
+        Air<span>Counsel</span><span style="color:rgba(184,154,90,0.35);font-size:0.85em;">.uk</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#trust">Why AirCounsel</a></li>
+        <li><a href="https://aircounsel.uk/report" target="_blank">Sample Report</a></li>
+        <li><a href="#cta-final" class="nav-cta">Book Walkthrough</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main" role="main">
+
+  <!-- ══ §1 — HERO ════════════════════════════════════════════════ -->
+  <section id="hero" aria-labelledby="hero-headline">
+
+    <!-- Video background placeholder — replace with actual 8s autoplay muted loop clip -->
+    <div class="hero-bg" aria-hidden="true">
+      <div class="hero-video-bg"></div>
+      <div class="hero-video-label">
+        <p>Hero Video Placeholder</p>
+        <span>8-second cinematic ascent — autoplay · muted · loop</span>
+      </div>
+    </div>
+    <div class="hero-bg-lines" aria-hidden="true"></div>
+
+    <div class="hero-content fade-up">
+      <div class="container">
+        <p class="label">UK Immigration · AI Intake Intelligence</p>
+        <h1 class="display" id="hero-headline">
+          You don't need<br />more enquiries.<br />
+          <em>You need fewer,<br />better ones.</em>
+        </h1>
+        <p class="sub">
+          Filtered before they reach a solicitor — scored against the Immigration Rules, delivered as a priority-ranked report your team can act on today.
+        </p>
+        <div class="cta-group">
+          <a href="#cta-final" class="btn btn-primary">Book a 10-minute walkthrough</a>
+          <a href="#how-it-works" class="btn btn-ghost">See how the filter works</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- BORROWED: scroll indicator from old version -->
+    <div class="hero-scroll" aria-hidden="true">Scroll</div>
+
+  </section>
+
+
+  <!-- ══ §2 — PATTERN BREAK ════════════════════════════════════════ -->
+  <section id="pattern-break" aria-labelledby="pattern-headline">
+    <div class="pattern-break-inner">
+
+      <div class="pattern-break-text fade-up">
+        <p class="label">The Real Problem</p>
+        <h2 id="pattern-headline">
+          Most immigration firms don't have a lead problem.<br />
+          <em>They have a qualification problem.</em>
+        </h2>
+        <p>
+          The enquiries arrive. But too many are the wrong enquiries — salary fails, Legal Aid requests, out-of-scope cases — consuming the one resource that cannot be recovered. Senior solicitor time.
+        </p>
+      </div>
+
+      <!-- Video placeholder — 12s pattern break clip -->
+      <div class="pattern-break-video fade-up delay-1">
+        <div class="video-placeholder">
+          <div class="video-placeholder-inner">
+            <div class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+            </div>
+            <p>Pattern Break Video
+              <span>12-second clip — too many weak enquiries → clarity rising</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ══ §3 — PROBLEM ══════════════════════════════════════════════ -->
+  <section id="problem" aria-labelledby="problem-headline">
+    <div class="container">
+      <div class="problem-grid">
+
+        <div class="fade-up">
+          <span class="label">The Cost of Poor Intake</span>
+          <h2 class="display" id="problem-headline">
+            The hidden cost<br />of poor qualification
+          </h2>
+
+          <!-- BORROWED: em dash list from old version -->
+          <ul class="problem-list" aria-label="Operational pain points">
+            <li>Non-viable enquiries occupying consultation slots</li>
+            <li>Senior solicitor hours spent on ineligible cases</li>
+            <li>Admin triage consuming paralegal capacity</li>
+            <li>No consistent scoring across inbound enquiry types</li>
+            <li>Cases that were never going to convert — but took time anyway</li>
+            <li>Compliance exposure from unstructured first-call data</li>
+          </ul>
+
+          <a href="#cta-final" class="btn btn-primary">See your firm's benchmark</a>
+        </div>
+
+        <!-- BORROWED: stat-block with gold left bar -->
+        <aside class="stat-block fade-up delay-1" aria-label="Financial impact">
+          <span class="label">Annual Impact</span>
+          <p class="stat-number">£332,000</p>
+          <p class="stat-desc">
+            The average annual cost to a UK immigration firm of missed intake calls, wasted consultations, and non-viable enquiries that should never have reached a solicitor's desk.
+          </p>
+          <p class="stat-source">Industry benchmark · UK immigration practice average</p>
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ §4 — SOLUTION ════════════════════════════════════════════ -->
+  <section id="solution" aria-labelledby="solution-headline">
+    <div class="container">
+
+      <div class="solution-intro fade-up">
+        <span class="label">The AirCounsel Engine</span>
+        <h2 class="display" id="solution-headline">
+          A pre-qualification engine<br />built for immigration teams
+        </h2>
+        <p>
+          AirCounsel filters enquiries before they reach a solicitor — using structured logic, current Immigration Rules thresholds, and a compliance-safe scoring methodology built specifically for UK immigration practice.
+        </p>
+      </div>
+
+      <div class="pillars fade-up delay-1" role="list">
+
+        <article class="pillar" role="listitem">
+          <div class="pillar-number" aria-hidden="true">01</div>
+          <h3>Filter non-viable enquiries</h3>
+          <p>Salary fails, Legal Aid requests, and out-of-jurisdiction cases identified and redirected automatically.</p>
+          <div class="pillar-accent" aria-hidden="true"></div>
+        </article>
+
+        <article class="pillar" role="listitem">
+          <div class="pillar-number" aria-hidden="true">02</div>
+          <h3>Prioritise strong cases</h3>
+          <p>Instruction-ready enquiries surfaced with a priority callback alert and a full qualification summary.</p>
+          <div class="pillar-accent" aria-hidden="true"></div>
+        </article>
+
+        <article class="pillar" role="listitem">
+          <div class="pillar-number" aria-hidden="true">03</div>
+          <h3>Reduce solicitor workload</h3>
+          <p>Your solicitors receive only qualified, structured, decision-ready referrals — scored across six gates.</p>
+          <div class="pillar-accent" aria-hidden="true"></div>
+        </article>
+
+      </div>
+
+      <!-- GIF placeholder — filtering animation -->
+      <figure class="solution-gif fade-up delay-2" aria-label="Filtering animation placeholder">
+        <div class="video-placeholder" style="height:100%;">
+          <div class="video-placeholder-inner">
+            <div class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+            </div>
+            <p>GIF Placeholder
+              <span>Filtering animation — enquiries entering, weak cases removed, strong cases delivered</span>
+            </p>
+          </div>
+        </div>
+      </figure>
+
+    </div>
+  </section>
+
+
+  <!-- ══ §5 — HOW IT WORKS ════════════════════════════════════════ -->
+  <section id="how-it-works" aria-labelledby="hiw-headline">
+    <div class="container">
+
+      <header class="steps-header fade-up">
+        <span class="label">The 3-step system</span>
+        <h2 class="display" id="hiw-headline">
+          From enquiry to<br />viable case
+        </h2>
+      </header>
+
+      <!-- BORROWED: square dots + gold gradient connector line from old version -->
+      <div class="steps" role="list">
+
+        <article class="step fade-up delay-1" role="listitem">
+          <div class="step-dot" aria-hidden="true"></div>
+          <p class="step-number">Step 01 — Intake</p>
+          <h3>Intake</h3>
+          <p>Clients answer a structured sequence of questions designed around legal viability, not volume.</p>
+        </article>
+
+        <article class="step fade-up delay-2" role="listitem">
+          <div class="step-dot" aria-hidden="true"></div>
+          <p class="step-number">Step 02 — Filter</p>
+          <h3>Filter</h3>
+          <p>Weak enquiries are removed automatically. No solicitor contact. No wasted time.</p>
+        </article>
+
+        <article class="step fade-up delay-3" role="listitem">
+          <div class="step-dot" aria-hidden="true"></div>
+          <p class="step-number">Step 03 — Deliver</p>
+          <h3>Deliver</h3>
+          <p>Only viable, structured cases reach your team — ready for a qualified first conversation.</p>
+        </article>
+
+      </div>
+
+      <div class="hiw-cta fade-up">
+        <a href="#cta-final" class="btn btn-primary">See the 60-second explainer</a>
+        <p>No account required. No commitment.</p>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ══ §6 — TRUST LAYER ═════════════════════════════════════════ -->
+  <section id="trust" aria-labelledby="trust-headline">
+    <div class="container">
+      <div class="trust-grid">
+
+        <div class="trust-copy fade-up">
+          <span class="label">Solicitor-grade</span>
+          <h2 class="display" id="trust-headline">
+            Built for firms<br />that value time
+          </h2>
+          <p>
+            AirCounsel is not an AI that generates legal advice. It is a qualification filter — built to protect the most valuable resource in your firm: senior expertise applied to the right cases.
+          </p>
+
+          <ul class="trust-points" aria-label="Trust assurances" role="list">
+            <li>
+              <span class="trust-tick" aria-hidden="true">
+                <svg viewBox="0 0 12 12"><polyline points="1,6 4,9 11,2"/></svg>
+              </span>
+              No AI hallucinations — structured logic, not generative output
+            </li>
+            <li>
+              <span class="trust-tick" aria-hidden="true">
+                <svg viewBox="0 0 12 12"><polyline points="1,6 4,9 11,2"/></svg>
+              </span>
+              No automated legal advice — qualification only
+            </li>
+            <li>
+              <span class="trust-tick" aria-hidden="true">
+                <svg viewBox="0 0 12 12"><polyline points="1,6 4,9 11,2"/></svg>
+              </span>
+              No risk to SRA compliance — pre-instruction data only
+            </li>
+            <li>
+              <span class="trust-tick" aria-hidden="true">
+                <svg viewBox="0 0 12 12"><polyline points="1,6 4,9 11,2"/></svg>
+              </span>
+              GDPR-compliant — no privileged client data processed
+            </li>
+            <li>
+              <span class="trust-tick" aria-hidden="true">
+                <svg viewBox="0 0 12 12"><polyline points="1,6 4,9 11,2"/></svg>
+              </span>
+              Built in Leeds — designed for UK immigration practice
+            </li>
+          </ul>
+        </div>
+
+        <aside class="trust-right fade-up delay-1" aria-label="Founding principle">
+          <blockquote class="trust-quote">
+            Your solicitors make every decision. AirCounsel makes sure those decisions start with better information.
+          </blockquote>
+          <p class="trust-attribution">AirCounsel · Founding Principle · Leeds</p>
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ §7 — ENGINE PREVIEW (subtle / manager-facing) ════════════ -->
+  <!-- BORROWED: opacity fade trick from old version -->
+  <section id="engine-preview" aria-labelledby="engine-headline">
+    <div class="container">
+      <div class="engine-inner">
+        <div class="engine-text">
+          <p class="engine-label">Technical Preview · For Practice Managers &amp; Partners</p>
+          <h2 id="engine-headline">The Intake Engine</h2>
+          <p>
+            For practice managers and partners who want to understand the underlying qualification logic, scoring methodology, and compliance architecture — a technical preview is available separately, outside the main marketing flow.
+          </p>
+        </div>
+        <a href="/engine" class="btn btn-engine">View the Engine&nbsp;&nbsp;→</a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ §8 — SOCIAL PROOF ════════════════════════════════════════ -->
+  <section id="social-proof" aria-label="Social proof indicators">
+    <div class="container">
+      <div class="proof-strip" role="list">
+        <div class="proof-item fade-up" role="listitem">
+          <p>Trusted by immigration practices in Leeds</p>
+          <span>Pilot Practice Network</span>
+        </div>
+        <div class="proof-item fade-up delay-1" role="listitem">
+          <p>Designed with solicitor workflows at the centre</p>
+          <span>Methodology</span>
+        </div>
+        <div class="proof-item fade-up delay-2" role="listitem">
+          <p>Built for high-volume immigration intake teams</p>
+          <span>Target Practice Profile</span>
+        </div>
+        <div class="proof-item fade-up delay-3" role="listitem">
+          <p>5.25 partner hours recovered in a 14-day pilot</p>
+          <span>Pilot Result · AC-PILOT-2025-001</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══ §9 — FINAL CTA ═══════════════════════════════════════════ -->
+  <section id="cta-final" aria-labelledby="cta-headline">
+    <div class="container">
+      <div class="cta-final-inner">
+
+        <div class="cta-divider" aria-hidden="true"></div>
+        <span class="label">No Obligation · 14-Day Free Pilot</span>
+
+        <h2 class="display" id="cta-headline">
+          Ready to reduce<br />non-viable enquiries?
+        </h2>
+
+        <p>
+          A free 14-day pilot runs against your actual intake. You see exactly what AirCounsel produces before any commitment. No setup cost. No procurement process. No risk.
+        </p>
+
+        <div class="cta-group">
+          <a href="mailto:hello@aircounsel.uk?subject=Walkthrough%20Request" class="btn btn-navy">Book a 10-minute walkthrough</a>
+          <a href="#how-it-works" class="btn btn-ghost-cta">See how the filter works</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+
+<!-- ══ FOOTER ════════════════════════════════════════════════════ -->
+<footer role="contentinfo">
+  <div class="container">
+
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="/" class="logo">Air<span>Counsel</span></a>
+        <p class="tagline">Where Law Meets Technology — Leeds</p>
+        <p>AI intake qualification for UK immigration law firms. Built to protect senior solicitor time and deliver instruction-ready cases.</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#trust">Why AirCounsel</a></li>
+          <li><a href="#cta-final">Book Walkthrough</a></li>
+          <li><a href="https://aircounsel.uk" target="_blank">Sample Report</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="/privacy">Privacy Policy</a></li>
+          <li><a href="/terms">Terms of Service</a></li>
+          <li><a href="mailto:hello@aircounsel.uk">Contact</a></li>
+          <li><a href="/engine" class="footer-engine-link">For Managers → View the Engine</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- BORROWED: legal disclaimer from old version footer -->
+    <div class="footer-bottom">
+      <p>© 2025 AirCounsel.uk · Oxford Row, Leeds · All rights reserved.</p>
+      <p class="footer-disclaimer">
+        AirCounsel does not provide legal advice. All enquiry filtering is non-advisory and compliance-safe.
+      </p>
+    </div>
+
+  </div>
+</footer>
+
+
+<!-- ══ SCRIPTS ═══════════════════════════════════════════════════ -->
+<script>
+  /* Scroll-activated header border */
+  (function () {
+    var header = document.getElementById('site-header');
+    function onScroll() {
+      header.classList.toggle('scrolled', window.scrollY > 60);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+  })();
+
+  /* Intersection Observer for fade-up elements */
+  (function () {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-up').forEach(function (el) {
+      observer.observe(el);
+    });
+  })();
+</script>
+
+</body>
+</html>
