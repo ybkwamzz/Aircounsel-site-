@@ -1,0 +1,1951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AirCounsel — Engine Preview · Technical Briefing</title>
+  <meta name="description" content="A controlled, solicitor-grade look at the AirCounsel intake qualification engine. For practice managers and partners." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── RESET ───────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ─── TOKENS ──────────────────────────────────────────────────── */
+    :root {
+      --ink:          #070d14;
+      --navy:         #0d1b2a;
+      --navy-mid:     #162032;
+      --navy-lift:    #1e2d40;
+      --navy-surface: #243347;
+      --white:        #f8f7f4;
+      --off-white:    #edebe4;
+      --gold:         #b89a5a;
+      --gold-light:   #d4b97a;
+      --gold-dim:     rgba(184,154,90,0.12);
+      --gold-ghost:   rgba(184,154,90,0.06);
+      --text-bright:  rgba(248,247,244,0.92);
+      --text-mid:     rgba(248,247,244,0.55);
+      --text-muted:   rgba(248,247,244,0.32);
+      --text-ghost:   rgba(248,247,244,0.14);
+      --border:       rgba(184,154,90,0.14);
+      --border-soft:  rgba(248,247,244,0.07);
+      --ff-display:   'Cormorant Garamond', Georgia, serif;
+      --ff-body:      'DM Sans', system-ui, sans-serif;
+      --ff-mono:      'DM Mono', 'Courier New', monospace;
+      --max:          1060px;
+      --max-narrow:   740px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--ink);
+      color: var(--text-mid);
+      font-family: var(--ff-body);
+      font-weight: 300;
+      font-size: 1rem;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ─── GLOBAL TYPOGRAPHY ───────────────────────────────────────── */
+    .display {
+      font-family: var(--ff-display);
+      font-weight: 300;
+      line-height: 1.07;
+      letter-spacing: -0.01em;
+      color: var(--text-bright);
+    }
+
+    .label {
+      font-family: var(--ff-body);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .mono {
+      font-family: var(--ff-mono);
+      font-size: 0.78rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    p { max-width: 58ch; color: var(--text-mid); }
+    p.wide { max-width: 70ch; }
+
+    /* ─── LAYOUT ──────────────────────────────────────────────────── */
+    .container {
+      width: 100%;
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    .container--narrow {
+      max-width: var(--max-narrow);
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    section { padding: 7rem 0; }
+
+    /* ─── ANIMATION ───────────────────────────────────────────────── */
+    @keyframes linePulse {
+      0%, 100% { opacity: 0.2; }
+      50%       { opacity: 0.7; }
+    }
+    @keyframes scanDown {
+      0%   { transform: translateY(-100%); opacity: 0; }
+      20%  { opacity: 1; }
+      80%  { opacity: 1; }
+      100% { transform: translateY(800%); opacity: 0; }
+    }
+    @keyframes dotBlink {
+      0%, 100% { opacity: 0.4; }
+      50%       { opacity: 1; }
+    }
+    @keyframes counterUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.9s cubic-bezier(0.22,1,0.36,1),
+                  transform 0.9s cubic-bezier(0.22,1,0.36,1);
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+    .fade-up.d1 { transition-delay: 0.12s; }
+    .fade-up.d2 { transition-delay: 0.24s; }
+    .fade-up.d3 { transition-delay: 0.36s; }
+    .fade-up.d4 { transition-delay: 0.48s; }
+
+    /* ─── BUTTONS ─────────────────────────────────────────────────── */
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      font-family: var(--ff-body);
+      font-size: 0.76rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 0.95rem 2.4rem;
+      border: 1px solid transparent;
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+    .btn-gold {
+      background: var(--gold);
+      color: var(--navy);
+      border-color: var(--gold);
+    }
+    .btn-gold:hover {
+      background: var(--gold-light);
+      border-color: var(--gold-light);
+      transform: translateY(-1px);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text-muted);
+      border-color: var(--border);
+    }
+    .btn-outline:hover {
+      color: var(--text-mid);
+      border-color: rgba(184,154,90,0.35);
+    }
+    .cta-row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* ─── NAVIGATION ──────────────────────────────────────────────── */
+    #site-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.3rem 0;
+      background: rgba(7,13,20,0.96);
+      border-bottom: 1px solid transparent;
+      backdrop-filter: blur(10px);
+      transition: border-color 0.3s;
+    }
+    #site-header.scrolled { border-bottom-color: var(--border); }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .nav-logo {
+      font-family: var(--ff-display);
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: var(--text-bright);
+      text-decoration: none;
+      letter-spacing: 0.03em;
+    }
+    .nav-logo span { color: var(--gold); }
+
+    .nav-badge {
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.8rem;
+      font-family: var(--ff-body);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+    .nav-right a {
+      font-size: 0.76rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-right a:hover { color: var(--gold); }
+
+    /* ─── HERO ────────────────────────────────────────────────────── */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      background: var(--ink);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* Animated grid background */
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(184,154,90,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(184,154,90,0.04) 1px, transparent 1px);
+      background-size: 80px 80px;
+      mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black 40%, transparent 100%);
+    }
+
+    /* Vertical scan line */
+    .hero-scan {
+      position: absolute;
+      top: 0; left: 50%;
+      width: 1px; height: 30%;
+      background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+      animation: scanDown 6s ease-in-out infinite;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    /* Corner marks */
+    .hero-corner {
+      position: absolute;
+      width: 20px; height: 20px;
+      border-color: rgba(184,154,90,0.2);
+      border-style: solid;
+    }
+    .hero-corner--tl { top: 5rem; left: 2rem; border-width: 1px 0 0 1px; }
+    .hero-corner--tr { top: 5rem; right: 2rem; border-width: 1px 1px 0 0; }
+    .hero-corner--bl { bottom: 3rem; left: 2rem; border-width: 0 0 1px 1px; }
+    .hero-corner--br { bottom: 3rem; right: 2rem; border-width: 0 1px 1px 0; }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 9rem 0 6rem;
+      width: 100%;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .hero-eyebrow::before,
+    .hero-eyebrow::after {
+      content: '';
+      display: block;
+      width: 50px; height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold));
+    }
+    .hero-eyebrow::after {
+      background: linear-gradient(to left, transparent, var(--gold));
+    }
+
+    .hero-content h1 {
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      margin-bottom: 0.4rem;
+    }
+    .hero-content h1 .accent {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .hero-subtitle {
+      font-family: var(--ff-display);
+      font-size: clamp(1rem, 2vw, 1.4rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text-muted);
+      max-width: 54ch;
+      margin: 1.2rem auto 3rem;
+      line-height: 1.5;
+    }
+
+    /* Restricted access notice */
+    .access-notice {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      border: 1px solid var(--border);
+      padding: 0.6rem 1.4rem;
+      margin-bottom: 3rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .access-dot {
+      width: 5px; height: 5px;
+      background: var(--gold);
+      border-radius: 50%;
+      animation: dotBlink 2s ease-in-out infinite;
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      color: var(--text-ghost);
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      z-index: 2;
+    }
+    .hero-scroll::after {
+      content: '';
+      display: block;
+      width: 1px; height: 32px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      opacity: 0.35;
+      animation: linePulse 2.5s ease-in-out infinite;
+    }
+
+    /* ─── SECTION DIVIDER ─────────────────────────────────────────── */
+    .section-rule {
+      border: none;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--border), transparent);
+      margin: 0;
+    }
+
+    /* ─── SECTION: WHAT IT DOES TODAY ─────────────────────────────── */
+    #what-it-does {
+      background: var(--navy);
+    }
+
+    .what-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 6rem;
+      align-items: start;
+    }
+
+    .what-left .label { margin-bottom: 1.2rem; display: block; }
+
+    .what-left h2 {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      margin-bottom: 1.5rem;
+    }
+
+    .what-left p {
+      font-size: 1rem;
+      line-height: 1.85;
+      margin-bottom: 1.2rem;
+    }
+
+    /* Layer badge */
+    .layer-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem 0.5rem 0.7rem;
+      margin-bottom: 2rem;
+    }
+    .layer-badge-dot {
+      width: 6px; height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+    }
+    .layer-badge span {
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-family: var(--ff-body);
+      font-weight: 500;
+    }
+
+    /* Gate list */
+    .gate-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .gate-item {
+      display: grid;
+      grid-template-columns: 2.5rem 1fr;
+      gap: 1rem;
+      align-items: start;
+      padding: 1.1rem 0;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .gate-item:first-child { border-top: 1px solid var(--border-soft); }
+    .gate-num {
+      font-family: var(--ff-mono);
+      font-size: 0.68rem;
+      color: var(--gold);
+      opacity: 0.7;
+      padding-top: 0.15rem;
+      letter-spacing: 0.08em;
+    }
+    .gate-content h4 {
+      font-family: var(--ff-display);
+      font-size: 1.05rem;
+      font-weight: 400;
+      color: var(--text-bright);
+      margin-bottom: 0.2rem;
+    }
+    .gate-content p {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      max-width: none;
+      line-height: 1.6;
+    }
+
+    /* Constraints block */
+    .constraints {
+      margin-top: 3rem;
+      padding: 2rem;
+      border: 1px solid var(--border);
+      background: var(--gold-ghost);
+    }
+    .constraints-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.2rem;
+      display: block;
+    }
+    .constraints ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .constraints ul li {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      font-size: 0.86rem;
+      color: var(--text-mid);
+    }
+    .constraints ul li::before {
+      content: '';
+      display: block;
+      width: 4px; height: 4px;
+      background: var(--gold);
+      border-radius: 50%;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+
+    /* ─── MICRO-SECTION: WHY THIS MATTERS TO MANAGERS ─────────────── */
+    #managers-note {
+      background: var(--ink);
+      padding: 5rem 0;
+      border-top: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .managers-inner {
+      max-width: var(--max-narrow);
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: grid;
+      grid-template-columns: 3rem 1fr;
+      gap: 2.5rem;
+      align-items: start;
+    }
+
+    .managers-icon {
+      width: 3rem; height: 3rem;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 0.2rem;
+    }
+    .managers-icon svg {
+      width: 16px; height: 16px;
+      stroke: var(--gold);
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .managers-copy .label { margin-bottom: 0.8rem; display: block; }
+    .managers-copy h3 {
+      font-family: var(--ff-display);
+      font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+      font-weight: 300;
+      color: var(--text-bright);
+      margin-bottom: 1.2rem;
+      line-height: 1.2;
+    }
+    .managers-copy p {
+      font-size: 0.95rem;
+      color: var(--text-mid);
+      max-width: 54ch;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+    .managers-copy p:last-child { margin-bottom: 0; }
+
+    .managers-quote {
+      font-family: var(--ff-display);
+      font-size: 1.2rem;
+      font-style: italic;
+      color: var(--text-mid);
+      border-left: 2px solid var(--gold);
+      padding-left: 1.5rem;
+      margin: 1.5rem 0;
+      max-width: 44ch;
+    }
+
+    /* ─── SECTION: CINEMATIC PREVIEW ──────────────────────────────── */
+    #cinematic {
+      background: var(--ink);
+      padding: 7rem 0;
+    }
+
+    .cinematic-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+    .cinematic-header .label { margin-bottom: 1.2rem; display: block; }
+    .cinematic-header h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: 1.5rem;
+    }
+
+    /* MICRO-ADJUSTMENT: Cinematic framing line */
+    .cinematic-framing {
+      font-family: var(--ff-display);
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--text-muted);
+      max-width: 58ch;
+      margin: 0 auto 3rem;
+      line-height: 1.65;
+      text-align: center;
+      border-top: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--border-soft);
+      padding: 1.5rem 0;
+    }
+
+    /* Video wrapper */
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: var(--navy-mid);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    /* Animated placeholder for engine video */
+    .video-placeholder-engine {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      background: linear-gradient(160deg, #0d1b2a 0%, #162032 60%, #0d1b2a 100%);
+    }
+
+    /* Animated grid inside video */
+    .video-grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(184,154,90,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(184,154,90,0.05) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+    }
+
+    .video-scan-line {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      animation: scanDown 4s ease-in-out infinite;
+      opacity: 0.3;
+    }
+
+    .video-center-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .video-play-ring {
+      width: 72px; height: 72px;
+      border: 1px solid rgba(184,154,90,0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      position: relative;
+    }
+    .video-play-ring::before {
+      content: '';
+      position: absolute;
+      inset: 6px;
+      border: 1px solid rgba(184,154,90,0.15);
+      border-radius: 50%;
+    }
+    .video-play-ring svg {
+      width: 22px; height: 22px;
+      fill: var(--gold);
+      margin-left: 3px;
+    }
+
+    .video-label-text {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .video-label-sub {
+      font-family: var(--ff-display);
+      font-size: 0.9rem;
+      font-style: italic;
+      color: var(--text-ghost);
+      margin-top: 0.3rem;
+    }
+
+    /* Corner marks on video */
+    .video-corner {
+      position: absolute;
+      width: 14px; height: 14px;
+      border-color: rgba(184,154,90,0.25);
+      border-style: solid;
+    }
+    .video-corner--tl { top: 12px; left: 12px; border-width: 1px 0 0 1px; }
+    .video-corner--tr { top: 12px; right: 12px; border-width: 1px 1px 0 0; }
+    .video-corner--bl { bottom: 12px; left: 12px; border-width: 0 0 1px 1px; }
+    .video-corner--br { bottom: 12px; right: 12px; border-width: 0 1px 1px 0; }
+
+    /* Data readout at bottom of video */
+    .video-readout {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 1.5rem;
+      right: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .readout-item {
+      text-align: left;
+    }
+    .readout-label {
+      font-family: var(--ff-mono);
+      font-size: 0.6rem;
+      color: rgba(184,154,90,0.35);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .readout-value {
+      font-family: var(--ff-mono);
+      font-size: 0.72rem;
+      color: rgba(184,154,90,0.55);
+      letter-spacing: 0.06em;
+    }
+
+    /* ─── SECTION: HOW IT WORKS ────────────────────────────────────── */
+    #how-it-works {
+      background: var(--navy);
+    }
+
+    .flow-diagram {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      position: relative;
+      gap: 0;
+      margin-top: 4rem;
+    }
+
+    .flow-diagram::before {
+      content: '';
+      position: absolute;
+      top: 1.4rem;
+      left: calc(100% / 6);
+      right: calc(100% / 6);
+      height: 1px;
+      background: linear-gradient(to right, var(--border-soft), var(--gold), var(--border-soft));
+      z-index: 0;
+    }
+
+    .flow-step {
+      padding: 0 2.5rem 3rem;
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .flow-dot {
+      width: 12px; height: 12px;
+      border: 1px solid var(--gold);
+      background: var(--navy);
+      margin: 0 auto 2rem;
+      position: relative;
+      z-index: 2;
+    }
+    .flow-dot::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 4px; height: 4px;
+      background: var(--gold);
+    }
+
+    .flow-step-label {
+      font-family: var(--ff-mono);
+      font-size: 0.65rem;
+      color: var(--gold);
+      letter-spacing: 0.12em;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .flow-step h3 {
+      font-family: var(--ff-display);
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: var(--text-bright);
+      margin-bottom: 0.8rem;
+    }
+
+    .flow-step p {
+      font-size: 0.87rem;
+      color: var(--text-muted);
+      max-width: none;
+      text-align: center;
+    }
+
+    /* Safety statement */
+    .safety-statement {
+      margin-top: 5rem;
+      padding: 2.5rem 3rem;
+      border: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 2rem;
+      align-items: center;
+      background: var(--gold-ghost);
+    }
+    .safety-icon {
+      width: 44px; height: 44px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .safety-icon svg {
+      width: 18px; height: 18px;
+      stroke: var(--gold);
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .safety-text p {
+      font-size: 0.92rem;
+      color: var(--text-mid);
+      max-width: none;
+    }
+    .safety-text strong {
+      color: var(--text-bright);
+      font-weight: 500;
+    }
+
+    /* ─── SECTION: FUTURE CAPABILITIES ────────────────────────────── */
+    #roadmap {
+      background: var(--ink);
+    }
+
+    .roadmap-header {
+      margin-bottom: 5rem;
+      max-width: 54ch;
+    }
+    .roadmap-header .label { margin-bottom: 1rem; display: block; }
+    .roadmap-header h2 { margin-bottom: 1.2rem; }
+    .roadmap-header p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    .roadmap-layers {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .roadmap-layer {
+      display: grid;
+      grid-template-columns: 4rem 1fr;
+      gap: 0;
+      border-top: 1px solid var(--border-soft);
+      padding: 3rem 0;
+      position: relative;
+    }
+    .roadmap-layer:last-child { border-bottom: 1px solid var(--border-soft); }
+
+    .layer-index {
+      font-family: var(--ff-mono);
+      font-size: 0.65rem;
+      color: rgba(184,154,90,0.3);
+      letter-spacing: 0.1em;
+      padding-top: 0.2rem;
+    }
+
+    .layer-body {
+      padding-left: 2rem;
+      border-left: 1px solid var(--border-soft);
+    }
+
+    .layer-body .layer-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .status-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+    }
+    .status-dot--active { background: #4ade80; }
+    .status-dot--future { background: var(--text-muted); opacity: 0.4; }
+
+    .status-text {
+      font-size: 0.65rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-family: var(--ff-body);
+      font-weight: 500;
+    }
+    .status-text--active { color: #4ade80; }
+    .status-text--future { color: var(--text-muted); }
+
+    .layer-body h3 {
+      font-family: var(--ff-display);
+      font-size: clamp(1.3rem, 2.5vw, 1.9rem);
+      font-weight: 300;
+      color: var(--text-bright);
+      margin-bottom: 0.8rem;
+      line-height: 1.2;
+    }
+
+    .layer-body .layer-desc {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      max-width: 54ch;
+      margin-bottom: 1.5rem;
+    }
+
+    .layer-features {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .layer-features li {
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      border: 1px solid var(--border-soft);
+      padding: 0.3rem 0.8rem;
+      font-family: var(--ff-mono);
+    }
+
+    .layer-inactive-notice {
+      font-size: 0.75rem;
+      color: var(--text-ghost);
+      font-style: italic;
+      margin-top: 1rem;
+      font-family: var(--ff-display);
+    }
+
+    /* Active layer highlight */
+    .roadmap-layer--active .layer-body {
+      border-left-color: var(--gold);
+    }
+
+    /* ─── SECTION: WHY LAYER 1 FIRST ──────────────────────────────── */
+    #why-layer-one {
+      background: var(--navy);
+    }
+
+    .why-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+    }
+
+    .why-left .label { margin-bottom: 1.2rem; display: block; }
+    .why-left h2 { margin-bottom: 1.5rem; }
+    .why-left p {
+      font-size: 0.95rem;
+      line-height: 1.85;
+      margin-bottom: 1.2rem;
+    }
+
+    /* Manager quote */
+    .manager-pull {
+      border-left: 2px solid var(--gold);
+      padding: 1.5rem 2rem;
+      margin: 3rem 0;
+      background: var(--gold-ghost);
+    }
+    .manager-pull blockquote {
+      font-family: var(--ff-display);
+      font-size: 1.3rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text-bright);
+      line-height: 1.5;
+      margin-bottom: 0.75rem;
+    }
+    .manager-pull cite {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-style: normal;
+      font-family: var(--ff-body);
+    }
+
+    /* Properties grid */
+    .properties {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 1px solid var(--border);
+    }
+    .property {
+      padding: 1.75rem;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .property:nth-child(even) { border-right: none; }
+    .property:nth-last-child(-n+2) { border-bottom: none; }
+    .property::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 2px; height: 0;
+      background: var(--gold);
+      transition: height 0.4s ease;
+    }
+    .property:hover::before { height: 100%; }
+    .property h4 {
+      font-family: var(--ff-display);
+      font-size: 1.05rem;
+      font-weight: 400;
+      color: var(--text-bright);
+      margin-bottom: 0.4rem;
+    }
+    .property p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      max-width: none;
+      line-height: 1.6;
+    }
+
+    /* ─── SECTION: WALKTHROUGH PREVIEW ────────────────────────────── */
+    #walkthrough {
+      background: var(--ink);
+    }
+
+    .walkthrough-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: start;
+    }
+
+    .walkthrough-left .label { margin-bottom: 1.2rem; display: block; }
+    .walkthrough-left h2 { margin-bottom: 1.5rem; }
+    .walkthrough-left p {
+      font-size: 0.95rem;
+      line-height: 1.85;
+      margin-bottom: 1.5rem;
+    }
+
+    .walkthrough-items {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .walkthrough-item {
+      display: grid;
+      grid-template-columns: 1.8rem 1fr;
+      gap: 1.2rem;
+      padding: 1.1rem 0;
+      border-bottom: 1px solid var(--border-soft);
+      align-items: baseline;
+    }
+    .walkthrough-item:first-child { border-top: 1px solid var(--border-soft); }
+    .wi-num {
+      font-family: var(--ff-mono);
+      font-size: 0.65rem;
+      color: var(--gold);
+      opacity: 0.6;
+      letter-spacing: 0.06em;
+      padding-top: 0.1rem;
+    }
+    .wi-text {
+      font-size: 0.9rem;
+      color: var(--text-mid);
+      line-height: 1.5;
+    }
+
+    /* Terminal card */
+    .terminal {
+      background: var(--ink);
+      border: 1px solid var(--border);
+      position: relative;
+    }
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--navy-mid);
+    }
+    .terminal-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+    .terminal-title {
+      font-family: var(--ff-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      margin-left: 0.5rem;
+    }
+    .terminal-body {
+      padding: 2rem;
+    }
+    .terminal-line {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 0.9rem;
+      align-items: flex-start;
+    }
+    .terminal-prompt {
+      font-family: var(--ff-mono);
+      font-size: 0.72rem;
+      color: var(--gold);
+      opacity: 0.5;
+      flex-shrink: 0;
+      padding-top: 0.05rem;
+    }
+    .terminal-text {
+      font-family: var(--ff-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: none;
+    }
+    .terminal-text .highlight { color: var(--gold-light); }
+    .terminal-text .pass { color: #4ade80; }
+    .terminal-text .fail { color: #f87171; }
+    .terminal-cursor {
+      display: inline-block;
+      width: 6px; height: 1em;
+      background: var(--gold);
+      opacity: 0.7;
+      animation: dotBlink 1s step-end infinite;
+      vertical-align: text-bottom;
+      margin-left: 2px;
+    }
+
+    /* ─── CREDIBILITY ANCHOR ───────────────────────────────────────── */
+    #credibility {
+      padding: 3.5rem 0;
+      background: var(--navy-mid);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .credibility-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+    .credibility-inner::before,
+    .credibility-inner::after {
+      content: '';
+      display: block;
+      flex: 1;
+      max-width: 120px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--border));
+    }
+    .credibility-inner::after {
+      background: linear-gradient(to left, transparent, var(--border));
+    }
+    .credibility-text {
+      text-align: center;
+    }
+    .credibility-text p {
+      font-family: var(--ff-display);
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--text-muted);
+      max-width: none;
+    }
+    .credibility-text span {
+      display: block;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(184,154,90,0.4);
+      margin-top: 0.5rem;
+      font-family: var(--ff-body);
+    }
+
+    /* ─── SECTION: FINAL CTA ───────────────────────────────────────── */
+    #cta-section {
+      background: var(--navy);
+    }
+
+    .cta-inner {
+      max-width: var(--max-narrow);
+      margin: 0 auto;
+      padding: 0 2rem;
+      text-align: center;
+    }
+
+    .cta-rule {
+      width: 40px; height: 1px;
+      background: var(--border);
+      margin: 0 auto 3rem;
+    }
+
+    .cta-inner .label { margin-bottom: 1.2rem; display: block; }
+    .cta-inner h2 {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      margin-bottom: 1.5rem;
+    }
+    .cta-inner p {
+      font-size: 0.95rem;
+      max-width: none;
+      margin-bottom: 2.5rem;
+      line-height: 1.8;
+    }
+    .cta-inner .cta-row { justify-content: center; }
+    .cta-reassurance {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+    }
+    .cta-reassurance span {
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-ghost);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .cta-reassurance span::before {
+      content: '';
+      display: block;
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--gold);
+      opacity: 0.4;
+    }
+
+    /* ─── FOOTER ───────────────────────────────────────────────────── */
+    footer {
+      background: var(--ink);
+      padding: 3rem 0 2rem;
+      border-top: 1px solid var(--border);
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .footer-logo {
+      font-family: var(--ff-display);
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: var(--text-bright);
+      text-decoration: none;
+    }
+    .footer-logo span { color: var(--gold); }
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+    .footer-links a {
+      font-size: 0.76rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--gold); }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-bottom p {
+      font-size: 0.7rem;
+      color: var(--text-ghost);
+      max-width: none;
+    }
+    .footer-disclaimer {
+      font-size: 0.68rem;
+      color: rgba(184,154,90,0.25);
+      font-style: italic;
+      font-family: var(--ff-display);
+      max-width: none;
+    }
+
+    /* ─── RESPONSIVE ───────────────────────────────────────────────── */
+    @media (max-width: 860px) {
+      nav .nav-right a:not(:last-child) { display: none; }
+
+      .what-grid,
+      .why-inner,
+      .walkthrough-grid { grid-template-columns: 1fr; gap: 3rem; }
+
+      .flow-diagram,
+      .properties { grid-template-columns: 1fr; }
+      .flow-diagram::before { display: none; }
+      .flow-step { padding: 0 0 2.5rem; text-align: left; }
+      .flow-dot { margin: 0 0 1.5rem; }
+      .flow-step-label,
+      .flow-step h3,
+      .flow-step p { text-align: left; }
+
+      .property { border-right: none; }
+      .property:nth-last-child(-n+2) { border-bottom: 1px solid var(--border); }
+      .property:last-child { border-bottom: none; }
+
+      .managers-inner { grid-template-columns: 1fr; gap: 1.5rem; }
+      .managers-icon { display: none; }
+
+      .safety-statement { grid-template-columns: 1fr; gap: 1rem; }
+
+      .roadmap-layer { grid-template-columns: 1fr; gap: 1rem; }
+      .layer-index { display: none; }
+      .layer-body { padding-left: 0; border-left: none; border-top: 2px solid var(--border-soft); padding-top: 1.5rem; }
+      .roadmap-layer--active .layer-body { border-top-color: var(--gold); }
+
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+
+      section { padding: 5rem 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAVIGATION ══════════════════════════════════════════════════ -->
+<header id="site-header" role="banner">
+  <div class="container">
+    <nav role="navigation" aria-label="Primary navigation">
+      <a href="/" class="nav-logo">Air<span>Counsel</span></a>
+      <div class="nav-badge">Engine Preview · Restricted</div>
+      <div class="nav-right">
+        <a href="/">← Back to main site</a>
+        <a href="#cta-section" class="btn btn-outline" style="padding:0.45rem 1.1rem;font-size:0.72rem;">Book Walkthrough</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main role="main">
+
+  <!-- ══ §1 — HERO ════════════════════════════════════════════════ -->
+  <section id="hero" aria-labelledby="hero-h1">
+
+    <div class="hero-grid" aria-hidden="true"></div>
+    <div class="hero-scan" aria-hidden="true"></div>
+
+    <div class="hero-corner hero-corner--tl" aria-hidden="true"></div>
+    <div class="hero-corner hero-corner--tr" aria-hidden="true"></div>
+    <div class="hero-corner hero-corner--bl" aria-hidden="true"></div>
+    <div class="hero-corner hero-corner--br" aria-hidden="true"></div>
+
+    <div class="hero-content">
+      <div class="container--narrow">
+
+        <div class="access-notice fade-up" role="note">
+          <span class="access-dot" aria-hidden="true"></span>
+          Technical Briefing · Practice Managers &amp; Partners
+        </div>
+
+        <div class="hero-eyebrow fade-up d1" aria-hidden="true">
+          <span class="label">Air Counsel · Engine Preview</span>
+        </div>
+
+        <h1 class="display fade-up d2" id="hero-h1">
+          A controlled look<br />at the intake<br /><span class="accent">qualification engine</span>
+        </h1>
+
+        <p class="hero-subtitle fade-up d3">
+          Designed to protect your team's time.<br />
+          Built for immigration departments in Leeds.
+        </p>
+
+        <div class="cta-row fade-up d4" style="justify-content:center;">
+          <a href="#cta-section" class="btn btn-gold">Book a 10-minute walkthrough</a>
+          <a href="#what-it-does" class="btn btn-outline">See what it does today</a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="hero-scroll" aria-hidden="true">Scroll</div>
+
+  </section>
+
+  <hr class="section-rule" />
+
+  <!-- ══ §2 — WHAT THE ENGINE DOES TODAY ═══════════════════════════ -->
+  <section id="what-it-does" aria-labelledby="what-h2">
+    <div class="container">
+      <div class="what-grid">
+
+        <div class="fade-up">
+          <span class="label">Layer 1 · Live Today</span>
+          <h2 class="display" id="what-h2">What the engine does today</h2>
+
+          <div class="layer-badge" style="margin-top:1.5rem;">
+            <span class="layer-badge-dot"></span>
+            <span>Intake Qualification Engine · Active</span>
+          </div>
+
+          <p>
+            This preview focuses on the part of the system that is live, simple, and safe to adopt immediately. No other layer is active. No other layer is part of the initial walkthrough.
+          </p>
+          <p>
+            The engine applies a structured scoring system to every inbound enquiry before it reaches a solicitor. The result is a qualification report — not a recommendation, not a decision. The solicitor decides. The engine filters the noise.
+          </p>
+
+          <div class="constraints fade-up d1">
+            <span class="constraints-label">System Constraints — Layer 1 Only</span>
+            <ul>
+              <li>No automation that changes your existing workflow</li>
+              <li>No interference with your case management system</li>
+              <li>No AI-generated legal advice of any kind</li>
+              <li>No privileged client data processed</li>
+              <li>No operational disruption during pilot</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="fade-up d1">
+          <p class="label" style="margin-bottom:1.5rem;">The Six Qualification Gates</p>
+          <ol class="gate-list" aria-label="Six qualification gates">
+            <li class="gate-item">
+              <span class="gate-num">01</span>
+              <div class="gate-content">
+                <h4>Route Fit</h4>
+                <p>Is the enquiry consistent with a viable UK immigration route for this individual?</p>
+              </div>
+            </li>
+            <li class="gate-item">
+              <span class="gate-num">02</span>
+              <div class="gate-content">
+                <h4>Eligibility Thresholds</h4>
+                <p>Does the enquiry meet current Home Office salary, qualification, and residency requirements?</p>
+              </div>
+            </li>
+            <li class="gate-item">
+              <span class="gate-num">03</span>
+              <div class="gate-content">
+                <h4>Immigration History</h4>
+                <p>Are there flags — refusals, overstays, prior applications — that affect viability?</p>
+              </div>
+            </li>
+            <li class="gate-item">
+              <span class="gate-num">04</span>
+              <div class="gate-content">
+                <h4>Fee Capacity</h4>
+                <p>Can the enquiry realistically proceed as a privately funded matter at your firm's fee level?</p>
+              </div>
+            </li>
+            <li class="gate-item">
+              <span class="gate-num">05</span>
+              <div class="gate-content">
+                <h4>Jurisdiction</h4>
+                <p>Is this a matter that falls within UK immigration jurisdiction and your firm's remit?</p>
+              </div>
+            </li>
+            <li class="gate-item">
+              <span class="gate-num">06</span>
+              <div class="gate-content">
+                <h4>Urgency</h4>
+                <p>Is there a time-sensitive element — an expiry, a court date, a removal notice — that affects prioritisation?</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ §3 — WHY THIS MATTERS TO MANAGERS (MICRO-SECTION) ════════ -->
+  <section id="managers-note" aria-labelledby="managers-h3">
+    <div class="managers-inner">
+
+      <div class="managers-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+
+      <div class="managers-copy fade-up">
+        <span class="label">Why This Matters to Managers</span>
+        <h3 id="managers-h3">
+          The problem is not volume.<br />It is the cost of the wrong volume.
+        </h3>
+
+        <blockquote class="managers-quote">
+          "We don't need more enquiries — we need clarity."
+        </blockquote>
+
+        <p>
+          Every non-viable enquiry that reaches a solicitor's desk costs time that cannot be recovered. At a conservative partner rate of £200 per hour, a firm fielding five unqualified enquiries per week is absorbing over £50,000 in lost productivity annually — before a single case is opened.
+        </p>
+        <p>
+          Layer 1 of the AirCounsel engine gives practice managers a mechanism to protect that time. It does not change how your team works. It changes what reaches them.
+        </p>
+        <p>
+          The pilot requires no technical setup, no system integration, and no preparation from your staff. You see the output in 10 minutes. You decide whether it works for your firm.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <hr class="section-rule" />
+
+  <!-- ══ §4 — CINEMATIC ENGINE PREVIEW ════════════════════════════ -->
+  <section id="cinematic" aria-labelledby="cinematic-h2">
+    <div class="container">
+
+      <div class="cinematic-header fade-up">
+        <span class="label">Cinematic Preview · Visual Briefing</span>
+        <h2 class="display" id="cinematic-h2">
+          How clarity forms<br />inside your practice
+        </h2>
+      </div>
+
+      <!-- MICRO-ADJUSTMENT: Cinematic framing line -->
+      <p class="cinematic-framing fade-up d1">
+        This cinematic preview is not the product — it is a visual explanation of how clarity forms inside your practice.
+      </p>
+
+      <!-- Video placeholder — replace src with actual cinematic engine preview -->
+      <div class="video-wrapper fade-up d2" role="img" aria-label="Cinematic engine preview video placeholder">
+
+        <div class="video-placeholder-engine">
+          <div class="video-grid-bg" aria-hidden="true"></div>
+          <div class="video-scan-line" aria-hidden="true"></div>
+
+          <div class="video-corner video-corner--tl" aria-hidden="true"></div>
+          <div class="video-corner video-corner--tr" aria-hidden="true"></div>
+          <div class="video-corner video-corner--bl" aria-hidden="true"></div>
+          <div class="video-corner video-corner--br" aria-hidden="true"></div>
+
+          <div class="video-center-content">
+            <div class="video-play-ring" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+            </div>
+            <p class="video-label-text">Cinematic Engine Preview</p>
+            <p class="video-label-sub">Replace with actual video — autoplay · muted · loop</p>
+          </div>
+
+          <div class="video-readout" aria-hidden="true">
+            <div class="readout-item">
+              <div class="readout-label">System</div>
+              <div class="readout-value">AC-ENGINE-L1</div>
+            </div>
+            <div class="readout-item" style="text-align:center;">
+              <div class="readout-label">Status</div>
+              <div class="readout-value">Active · Leeds</div>
+            </div>
+            <div class="readout-item" style="text-align:right;">
+              <div class="readout-label">Layer</div>
+              <div class="readout-value">01 of 03</div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <hr class="section-rule" />
+
+  <!-- ══ §5 — HOW IT WORKS ════════════════════════════════════════ -->
+  <section id="how-it-works" aria-labelledby="how-h2">
+    <div class="container">
+
+      <div class="fade-up" style="max-width:54ch;">
+        <span class="label" style="margin-bottom:1rem;display:block;">Simple, Non-Technical</span>
+        <h2 class="display" id="how-h2">
+          Three steps.<br />No integrations.<br />No risk.
+        </h2>
+      </div>
+
+      <div class="flow-diagram fade-up d1" role="list">
+        <article class="flow-step" role="listitem">
+          <div class="flow-dot" aria-hidden="true"></div>
+          <span class="flow-step-label">Step 01</span>
+          <h3>Receive</h3>
+          <p>The engine receives an inbound enquiry through a structured intake form. The client answers a defined sequence of questions.</p>
+        </article>
+        <article class="flow-step" role="listitem">
+          <div class="flow-dot" aria-hidden="true"></div>
+          <span class="flow-step-label">Step 02</span>
+          <h3>Score</h3>
+          <p>The six gates are applied automatically. A qualification score is generated. Non-viable enquiries are redirected before any solicitor contact.</p>
+        </article>
+        <article class="flow-step" role="listitem">
+          <div class="flow-dot" aria-hidden="true"></div>
+          <span class="flow-step-label">Step 03</span>
+          <h3>Deliver</h3>
+          <p>Your team receives a priority-ranked qualification report. Only viable cases arrive. Every case arrives with full context.</p>
+        </article>
+      </div>
+
+      <div class="safety-statement fade-up d2">
+        <div class="safety-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="safety-text">
+          <p>
+            <strong>This is the only part of the system you will see in the walkthrough.</strong>
+            No integrations required. No system changes. No risk to your current workflow. You can run the pilot without your IT team, without a procurement process, and without preparing your staff.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <hr class="section-rule" />
+
+  <!-- ══ §6 — ROADMAP / FUTURE LAYERS ════════════════════════════ -->
+  <section id="roadmap" aria-labelledby="roadmap-h2">
+    <div class="container">
+
+      <div class="roadmap-header fade-up">
+        <span class="label">Optional Modules · Not Part of the Pilot</span>
+        <h2 class="display" id="roadmap-h2">
+          Future capabilities<br />shown for context only
+        </h2>
+        <p>
+          These modules are not active, not required, and not part of the initial rollout. They are shown here only to give practice managers and partners visibility into the long-term roadmap. Firms explore these months later — only if they choose to.
+        </p>
+      </div>
+
+      <div class="roadmap-layers fade-up d1">
+
+        <!-- Layer 1 — Active -->
+        <article class="roadmap-layer roadmap-layer--active" aria-labelledby="layer1-h3">
+          <div class="layer-index mono">L·01</div>
+          <div class="layer-body">
+            <div class="layer-status">
+              <span class="status-dot status-dot--active" aria-hidden="true"></span>
+              <span class="status-text status-text--active">Active · Available Now</span>
+            </div>
+            <h3 id="layer1-h3">Intake Qualification Engine</h3>
+            <p class="layer-desc">
+              The structured scoring system that filters non-viable enquiries before they reach a solicitor. Six gates. Clear decision logic. No workflow disruption. This is the layer active today.
+            </p>
+            <ul class="layer-features">
+              <li>Six qualification gates</li>
+              <li>Priority callback alerts</li>
+              <li>Qualification report delivery</li>
+              <li>Compliance-safe intake only</li>
+              <li>Free 14-day pilot</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Layer 2 — Future -->
+        <article class="roadmap-layer" aria-labelledby="layer2-h3">
+          <div class="layer-index mono">L·02</div>
+          <div class="layer-body">
+            <div class="layer-status">
+              <span class="status-dot status-dot--future" aria-hidden="true"></span>
+              <span class="status-text status-text--future">Future Module · Not Active</span>
+            </div>
+            <h3 id="layer2-h3">Financial Intelligence</h3>
+            <p class="layer-desc">
+              A future module that maps intake quality to financial outcomes. Designed for firms that want granular visibility into the cost and profitability of their intake pipeline.
+            </p>
+            <ul class="layer-features">
+              <li>Cost per case analysis</li>
+              <li>Profitability by matter type</li>
+              <li>Operational efficiency mapping</li>
+              <li>Partner-level reporting</li>
+            </ul>
+            <p class="layer-inactive-notice">Not part of the pilot. Not shown in the walkthrough. Available on request months after Layer 1 adoption.</p>
+          </div>
+        </article>
+
+        <!-- Layer 3 — Future -->
+        <article class="roadmap-layer" aria-labelledby="layer3-h3">
+          <div class="layer-index mono">L·03</div>
+          <div class="layer-body">
+            <div class="layer-status">
+              <span class="status-dot status-dot--future" aria-hidden="true"></span>
+              <span class="status-text status-text--future">Long-Term Module · Not Active</span>
+            </div>
+            <h3 id="layer3-h3">Behaviour Engine</h3>
+            <p class="layer-desc">
+              A long-term module designed to help firms understand workflow patterns, decision dynamics, and partner-level performance signals. Not shown in any walkthrough and not required for any firm adopting Layer 1.
+            </p>
+            <ul class="layer-features">
+              <li>Workflow pattern analysis</li>
+              <li>Decision dynamics modelling</li>
+              <li>Partner alignment insights</li>
+            </ul>
+            <p class="layer-inactive-notice">Included here as a roadmap item only. No firm is required to progress to this layer at any point.</p>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-rule" />
+
+  <!-- ══ §7 — WHY LAYER 1 FIRST ══════════════════════════════════ -->
+  <section id="why-layer-one" aria-labelledby="why-h2">
+    <div class="container">
+      <div class="why-inner">
+
+        <div class="fade-up">
+          <span class="label" style="margin-bottom:1.2rem;display:block;">The Adoption Principle</span>
+          <h2 class="display" id="why-h2">
+            Why we<br />start with<br />Layer 1
+          </h2>
+          <p style="margin-top:1.5rem;">
+            Managing partners and practice managers have made one thing clear when we present the full system.
+          </p>
+
+          <div class="manager-pull">
+            <blockquote>"Show us something simple that works today."</blockquote>
+            <cite>Managing Partners · UK Immigration Practices</cite>
+          </div>
+
+          <p>
+            Layer 1 is designed to answer that exactly. It is operationally safe, immediately valuable, and completely controlled by your team. You decide what threshold qualifies for your firm. We build the filter to your specification.
+          </p>
+          <p>
+            Layers 2 and 3 are optional modules that firms can explore if and when they choose to — months after Layer 1 has delivered measurable value.
+          </p>
+        </div>
+
+        <div class="fade-up d1">
+          <p class="label" style="margin-bottom:1.5rem;">Layer 1 Properties</p>
+          <div class="properties">
+            <div class="property">
+              <h4>Low-risk</h4>
+              <p>No integration. No disruption. No changes to existing workflow.</p>
+            </div>
+            <div class="property">
+              <h4>Easy to adopt</h4>
+              <p>Live within five working days. No IT involvement required.</p>
+            </div>
+            <div class="property">
+              <h4>Operationally safe</h4>
+              <p>Pre-instruction data only. Fully GDPR-compliant. SRA guidance aligned.</p>
+            </div>
+            <div class="property">
+              <h4>Immediately valuable</h4>
+              <p>Results visible within the 14-day pilot window. Measurable output from day one.</p>
+            </div>
+            <div class="property">
+              <h4>Fully controlled</h4>
+              <p>Your team sets the scoring thresholds. You own every decision the engine makes.</p>
+            </div>
+            <div class="property">
+              <h4>No commitment</h4>
+              <p>The pilot is free. No procurement process. No contract required to start.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-rule" />
+
+  <!-- ══ §8 — WALKTHROUGH PREVIEW ════════════════════════════════ -->
+  <section id="walkthrough" aria-labelledby="walkthrough-h2">
+    <div class="container">
+      <div class="walkthrough-grid">
+
+        <div class="fade-up">
+          <span class="label" style="margin-bottom:1.2rem;display:block;">The 10-Minute Walkthrough</span>
+          <h2 class="display" id="walkthrough-h2">
+            A meeting,<br />not a video
+          </h2>
+          <p style="margin-top:1.5rem;">
+            No technical setup. No slides. No preparation from your team. The walkthrough is a short, practical demonstration of Layer 1 — the intake qualification engine as it would operate for your firm.
+          </p>
+          <p>
+            You will see the scoring logic applied to a live sample of enquiry types typical for a UK immigration practice. You ask questions. We show you exactly how the output appears to your team.
+          </p>
+          <p>
+            If at the end of 10 minutes it is not clearly useful, there is no further contact.
+          </p>
+        </div>
+
+        <div class="fade-up d1">
+
+          <p class="label" style="margin-bottom:1.5rem;">What You Will See</p>
+          <ol class="walkthrough-items" aria-label="Walkthrough agenda">
+            <li class="walkthrough-item">
+              <span class="wi-num">01</span>
+              <span class="wi-text">How the engine scores an inbound enquiry across the six gates</span>
+            </li>
+            <li class="walkthrough-item">
+              <span class="wi-num">02</span>
+              <span class="wi-text">How the qualification thresholds are set — and how your team controls them</span>
+            </li>
+            <li class="walkthrough-item">
+              <span class="wi-num">03</span>
+              <span class="wi-text">How the qualification report appears to your solicitors and practice manager</span>
+            </li>
+            <li class="walkthrough-item">
+              <span class="wi-num">04</span>
+              <span class="wi-text">How non-viable enquiries are redirected — and what the client receives</span>
+            </li>
+            <li class="walkthrough-item">
+              <span class="wi-num">05</span>
+              <span class="wi-text">How the pilot is set up for your firm in five working days</span>
+            </li>
+          </ol>
+
+          <!-- Simulated terminal output -->
+          <div class="terminal" style="margin-top:2rem;">
+            <div class="terminal-bar">
+              <div class="terminal-dot"></div>
+              <div class="terminal-dot"></div>
+              <div class="terminal-dot"></div>
+              <span class="terminal-title">AC · QUALIFICATION ENGINE · SAMPLE OUTPUT</span>
+            </div>
+            <div class="terminal-body">
+              <div class="terminal-line">
+                <span class="terminal-prompt">→</span>
+                <span class="terminal-text">Enquiry received · <span class="highlight">Skilled Worker Route</span></span>
+              </div>
+              <div class="terminal-line">
+                <span class="terminal-prompt">→</span>
+                <span class="terminal-text">Gate 01 Route Fit <span class="pass">· PASS</span></span>
+              </div>
+              <div class="terminal-line">
+                <span class="terminal-prompt">→</span>
+                <span class="terminal-text">Gate 02 Salary Threshold £38,700 <span class="fail">· FAIL £26,000 declared</span></span>
+              </div>
+              <div class="terminal-line">
+                <span class="terminal-prompt">→</span>
+                <span class="terminal-text">Score <span class="highlight">28 / 100</span> · Below threshold</span>
+              </div>
+              <div class="terminal-line">
+                <span class="terminal-prompt">→</span>
+                <span class="terminal-text">Action <span class="fail">· Redirected · No solicitor contact</span></span>
+              </div>
+              <div class="terminal-line">
+                <span class="terminal-prompt">→</span>
+                <span class="terminal-text">Partner hours saved <span class="pass">· 0.75 hrs</span><span class="terminal-cursor"></span></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CREDIBILITY ANCHOR ════════════════════════════════════════ -->
+  <!-- MICRO-ADJUSTMENT: credibility anchor -->
+  <section id="credibility" aria-label="Credibility statement">
+    <div class="container">
+      <div class="credibility-inner">
+        <div class="credibility-text">
+          <p>Built in Leeds, designed with immigration teams.</p>
+          <span>AirCounsel · UK Immigration · Legal Technology</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FINAL CTA ═════════════════════════════════════════════════ -->
+  <section id="cta-section" aria-labelledby="cta-h2">
+    <div class="container">
+      <div class="cta-inner">
+
+        <div class="cta-rule" aria-hidden="true"></div>
+
+        <span class="label">No Obligation · No Preparation Required</span>
+
+        <h2 class="display" id="cta-h2" style="margin-top:1.2rem;">
+          Book a 10-minute<br />walkthrough
+        </h2>
+
+        <p style="margin-top:1.2rem;margin-left:auto;margin-right:auto;">
+          A short, practical demonstration of the intake qualification engine. No technical knowledge needed. No commitment required. You see exactly what Layer 1 produces before any decision is made.
+        </p>
+
+        <div class="cta-row" style="margin-top:2.5rem;">
+          <a href="mailto:hello@aircounsel.uk?subject=Engine%20Walkthrough%20Request" class="btn btn-gold">Book your walkthrough</a>
+          <a href="/" class="btn btn-outline">Return to main site</a>
+        </div>
+
+        <div class="cta-reassurance" aria-label="Walkthrough guarantees">
+          <span>No setup required</span>
+          <span>No technical knowledge</span>
+          <span>No commitment</span>
+          <span>10 minutes only</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══ FOOTER ════════════════════════════════════════════════════ -->
+<footer role="contentinfo">
+  <div class="container">
+    <div class="footer-inner">
+      <a href="/" class="footer-logo">Air<span>Counsel</span></a>
+      <ul class="footer-links">
+        <li><a href="/">Main Site</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+        <li><a href="mailto:hello@aircounsel.uk">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 AirCounsel.uk · Oxford Row, Leeds · Engine Preview · Restricted Distribution</p>
+      <p class="footer-disclaimer">AirCounsel does not provide legal advice. All enquiry filtering is non-advisory and compliance-safe.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ══ SCRIPTS ═══════════════════════════════════════════════════ -->
+<script>
+  /* Scrolled header border */
+  (function () {
+    var h = document.getElementById('site-header');
+    window.addEventListener('scroll', function () {
+      h.classList.toggle('scrolled', window.scrollY > 60);
+    }, { passive: true });
+  })();
+
+  /* Intersection observer for fade-up */
+  (function () {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.fade-up').forEach(function (el) { obs.observe(el); });
+  })();
+</script>
+
+</body>
+</html>
