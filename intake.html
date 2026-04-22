@@ -3,12 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AirCounsel — Start Your Enquiry</title>
-  <meta name="description" content="Begin your immigration enquiry with Air Counsel. Structured, confidential, and solicitor-safe." />
-  <link rel="icon" type="image/png" href="/favicon.png" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="shortcut icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/favicon-192.png" />
+  <title>Immigration Intake Form — Suitability Assessment | AirCounsel</title>
+  <meta name="description" content="Submit your details for a structured, solicitor-grade suitability assessment powered by AirCounsel’s intake engine." />
+  <link rel="canonical" href="https://aircounsel.uk/intake.html" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
   <link rel="manifest" href="/manifest.json" />
   <meta name="msapplication-config" content="/browserconfig.xml" />
   <meta name="msapplication-TileColor" content="#0D0D0D" />
@@ -737,7 +740,7 @@
         <button class="lang-btn" onclick="setLang(this,'ur')" aria-pressed="false">UR</button>
         <button class="lang-btn" onclick="setLang(this,'zh')" aria-pressed="false">ZH</button>
       </div>
-      <span class="header-note">Confidential Intake · GDPR Compliant</span>
+      <span class="header-note" id="header-note">Confidential Intake · GDPR Compliant</span>
     </div>
   </header>
 
@@ -1168,7 +1171,7 @@
           </div>
 
           <div class="compliance-note" role="note">
-            <strong>Before you submit:</strong> By submitting this form you confirm that the information provided is accurate to the best of your knowledge. Your data will be processed by Air Counsel in accordance with our <a href="/privacy" style="color:var(--gold-light);text-decoration:none;">Privacy Policy</a> and UK GDPR. It will be used only for the purpose of assessing your enquiry and contacting you about next steps. No legal advice is provided by this form. All eligibility assessments and decisions are made by qualified solicitors.
+            <strong>Before you submit:</strong> By submitting this form you confirm that the information provided is accurate to the best of your knowledge. Your data will be processed by Air Counsel in accordance with our <a href="privacy-policy.html" style="color:var(--gold-light);text-decoration:none;">Privacy Policy</a> and UK GDPR. It will be used only for the purpose of assessing your enquiry and contacting you about next steps. No legal advice is provided by this form. All eligibility assessments and decisions are made by qualified solicitors.
           </div>
 
           <div class="nav-row" style="flex-direction:column;gap:0.8rem;">
@@ -1255,7 +1258,7 @@
   </main>
 
   <footer class="site-footer" role="contentinfo">
-    <p>© 2025 AirCounsel.uk · <a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms</a></p>
+    <p>© 2025 AirCounsel.uk · <a href="privacy-policy.html">Privacy Policy</a> · <a href="terms-of-service.html">Terms</a></p>
     <p>GDPR Compliant · SRA Guidance Aligned · No legal advice is provided by this form</p>
   </footer>
 
@@ -1280,6 +1283,95 @@
   let presentationLang = 'en';
   let activeAudio = null;
   let isMuted = localStorage.getItem('ac_audio_muted') === 'true';
+  const UI_TRANSLATIONS = {
+    en: {
+      headerNote: 'Confidential Intake · GDPR Compliant',
+      beforeBegin: 'Before you begin',
+      gatePrefix: 'Gate',
+      ofSix: 'of 6',
+      gateNames: ['Your Details', 'Route Fit', 'Eligibility', 'Immigration History', 'Fee Capacity', 'Jurisdiction', 'Urgency'],
+      back: 'Back',
+      continue: 'Continue',
+      submit: 'Submit enquiry',
+      mute: 'Mute audio',
+      unmute: 'Unmute audio'
+    },
+    fr: {
+      headerNote: 'Collecte confidentielle · Conforme RGPD',
+      beforeBegin: 'Avant de commencer',
+      gatePrefix: 'Étape',
+      ofSix: 'sur 6',
+      gateNames: ['Vos coordonnées', 'Type de visa', 'Éligibilité', 'Historique migratoire', 'Capacité financière', 'Juridiction', 'Urgence'],
+      back: 'Retour',
+      continue: 'Continuer',
+      submit: 'Soumettre la demande',
+      mute: 'Couper l’audio',
+      unmute: 'Activer l’audio'
+    },
+    ar: {
+      headerNote: 'استمارة سرية · متوافقة مع GDPR',
+      beforeBegin: 'قبل البدء',
+      gatePrefix: 'المرحلة',
+      ofSix: 'من 6',
+      gateNames: ['بياناتك', 'نوع المسار', 'الأهلية', 'السجل الهجري', 'القدرة المالية', 'الاختصاص', 'الاستعجال'],
+      back: 'رجوع',
+      continue: 'متابعة',
+      submit: 'إرسال الطلب',
+      mute: 'كتم الصوت',
+      unmute: 'إلغاء كتم الصوت'
+    },
+    ur: {
+      headerNote: 'خفیہ انٹیک · GDPR کے مطابق',
+      beforeBegin: 'شروع کرنے سے پہلے',
+      gatePrefix: 'مرحلہ',
+      ofSix: 'میں سے 6',
+      gateNames: ['آپ کی تفصیلات', 'ویزہ روٹ', 'اہلیت', 'امیگریشن ہسٹری', 'فیس کی استطاعت', 'دائرہ اختیار', 'فوریت'],
+      back: 'واپس',
+      continue: 'جاری رکھیں',
+      submit: 'درخواست جمع کریں',
+      mute: 'آڈیو بند کریں',
+      unmute: 'آڈیو چلائیں'
+    },
+    zh: {
+      headerNote: '保密受理 · 符合 GDPR',
+      beforeBegin: '开始前',
+      gatePrefix: '步骤',
+      ofSix: '共 6 步',
+      gateNames: ['您的信息', '签证路径', '资格条件', '移民记录', '费用能力', '司法辖区', '紧急程度'],
+      back: '返回',
+      continue: '继续',
+      submit: '提交咨询',
+      mute: '静音',
+      unmute: '取消静音'
+    }
+  };
+  function getUiCopy() {
+    return UI_TRANSLATIONS[presentationLang] || UI_TRANSLATIONS.en;
+  }
+  function setButtonLeadText(btn, text) {
+    if (!btn) return;
+    const textNode = Array.from(btn.childNodes).find(
+      n => n.nodeType === Node.TEXT_NODE && n.textContent.trim().length
+    );
+    if (textNode) textNode.textContent = ` ${text} `;
+  }
+  function applyLanguageUI() {
+    const copy = getUiCopy();
+    const header = document.getElementById('header-note');
+    if (header) header.textContent = copy.headerNote;
+
+    document.querySelectorAll('.btn-back').forEach(btn => {
+      btn.textContent = `← ${copy.back}`;
+    });
+    document.querySelectorAll('.btn-next').forEach(btn => {
+      if (btn.id === 'submit-btn') btn.textContent = copy.submit;
+      else setButtonLeadText(btn, copy.continue);
+    });
+
+    const muteLabel = document.getElementById('mute-label');
+    if (muteLabel) muteLabel.textContent = isMuted ? copy.unmute : copy.mute;
+    updateProgress(currentGate);
+  }
 
   // ── LANGUAGE TOGGLE (PRESENTATION LAYER ONLY) ──────────────────
   // Changes UI display language only. All form values are structured data
@@ -1292,7 +1384,7 @@
     });
     btn.classList.add('active');
     btn.setAttribute('aria-pressed', 'true');
-    // Phase 2: full string localisation added when pilot clients confirm demand
+    applyLanguageUI();
   }
 
   // ── AUDIO ENGINE ───────────────────────────────────────────────
@@ -1338,6 +1430,7 @@
   function toggleMute() {
     isMuted = !isMuted;
     localStorage.setItem('ac_audio_muted', isMuted);
+    const copy = getUiCopy();
     const label = document.getElementById('mute-label');
     const waves = document.getElementById('speaker-waves');
     const indicator = document.getElementById('audio-playing');
@@ -1345,10 +1438,10 @@
     if (isMuted) {
       if (activeAudio) { activeAudio.pause(); activeAudio.currentTime = 0; }
       indicator && indicator.classList.remove('visible');
-      if (label) label.textContent = 'Unmute audio';
+      if (label) label.textContent = copy.unmute;
       if (waves) waves.style.opacity = '0.2';
     } else {
-      if (label) label.textContent = 'Mute audio';
+      if (label) label.textContent = copy.mute;
       if (waves) waves.style.opacity = '1';
       playConfirmationAudio();
     }
@@ -1358,21 +1451,12 @@
   let currentGate = 0;
   const TOTAL_GATES = 7; // gates 0–6
 
-  const GATE_NAMES = [
-    'Your Details',
-    'Route Fit',
-    'Eligibility',
-    'Immigration History',
-    'Fee Capacity',
-    'Jurisdiction',
-    'Urgency'
-  ];
-
   // ── PROGRESS ───────────────────────────────────────────────────
   function updateProgress(gate) {
+    const copy = getUiCopy();
     document.getElementById('gate-label').textContent =
-      gate === 0 ? 'Before you begin' : `Gate ${gate} of 6`;
-    document.getElementById('step-count').textContent = GATE_NAMES[gate];
+      gate === 0 ? copy.beforeBegin : `${copy.gatePrefix} ${gate} ${copy.ofSix}`;
+    document.getElementById('step-count').textContent = copy.gateNames[gate] || copy.gateNames[0];
 
     const track = document.getElementById('progress-track');
     track.setAttribute('aria-valuenow', gate);
@@ -1393,14 +1477,25 @@
     if (target) target.classList.add('show');
 
     // Update gate 2 description
-    const descs = {
-      skilled_worker: 'Questions specific to the Skilled Worker route, including salary thresholds and sponsorship.',
-      spouse_partner_visa: 'Questions specific to the Spouse / Partner Visa route, including the financial requirement.',
-      ilr_settlement: 'Questions specific to ILR / Settlement, including continuous residence and absence days.',
-      student_visa: 'Questions specific to the Student Visa route, including your CAS and maintenance funds.',
-      business_visa: 'Questions specific to the Business / Innovator Visa route.',
-      other: 'Please describe your situation so your solicitor can assess the most appropriate route.'
+    const routeDescs = {
+      en: {
+        skilled_worker: 'Questions specific to the Skilled Worker route, including salary thresholds and sponsorship.',
+        spouse_partner_visa: 'Questions specific to the Spouse / Partner Visa route, including the financial requirement.',
+        ilr_settlement: 'Questions specific to ILR / Settlement, including continuous residence and absence days.',
+        student_visa: 'Questions specific to the Student Visa route, including your CAS and maintenance funds.',
+        business_visa: 'Questions specific to the Business / Innovator Visa route.',
+        other: 'Please describe your situation so your solicitor can assess the most appropriate route.'
+      },
+      fr: {
+        skilled_worker: 'Questions spécifiques au visa Skilled Worker, y compris les seuils de salaire et le sponsoring.',
+        spouse_partner_visa: 'Questions spécifiques au visa conjoint/partenaire, y compris l’exigence financière.',
+        ilr_settlement: 'Questions spécifiques à l’ILR/Settlement, y compris la résidence continue et les absences.',
+        student_visa: 'Questions spécifiques au visa étudiant, y compris CAS et fonds de subsistance.',
+        business_visa: 'Questions spécifiques au visa Business / Innovator.',
+        other: 'Veuillez décrire votre situation pour permettre au solicitor d’évaluer la meilleure voie.'
+      }
     };
+    const descs = routeDescs[presentationLang] || routeDescs.en;
     const el = document.getElementById('gate2-desc');
     if (el && descs[route]) el.textContent = descs[route];
   }
@@ -1625,8 +1720,9 @@
   // ── SUBMIT ─────────────────────────────────────────────────────
   async function submitForm() {
     const btn = document.getElementById('submit-btn');
+    const copy = getUiCopy();
     btn.disabled = true;
-    btn.textContent = 'Submitting…';
+    btn.textContent = `${copy.submit}…`;
 
     // Hide form, show loading
     document.getElementById('intake-form').style.display = 'none';
@@ -1678,11 +1774,12 @@
     document.getElementById('intake-form').style.display = 'block';
     const btn = document.getElementById('submit-btn');
     btn.disabled = false;
-    btn.textContent = 'Submit my enquiry';
+    btn.textContent = getUiCopy().submit;
   }
 
   // ── INIT ───────────────────────────────────────────────────────
   updateProgress(0);
+  applyLanguageUI();
 </script>
 
 </body>
