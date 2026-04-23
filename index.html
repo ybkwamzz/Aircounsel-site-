@@ -891,6 +891,40 @@
       margin-top: 0.4rem;
     }
 
+    /* ─── LATEST REPORTS & GUIDES ──────────────────────────────── */
+    #latest-reports {
+      padding: 5rem 0;
+      background: var(--off-white);
+      border-bottom: 1px solid var(--border);
+    }
+    .reports-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .reports-header h2 {
+      color: var(--navy);
+      margin-bottom: 0.6rem;
+    }
+    .reports-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    .report-link {
+      display: block;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      background: var(--white);
+      padding: 1.1rem 1.25rem;
+      color: var(--text-mid);
+      font-weight: 500;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .report-link:hover {
+      border-color: var(--gold);
+      transform: translateY(-1px);
+    }
+
     /* ─── FINAL CTA ──────────────────────────────────────────────── */
     #cta-final {
       background: var(--gold);
@@ -1077,6 +1111,11 @@
       .footer-disclaimer { text-align: left !important; }
     }
   </style>
+
+  <meta name="geo.region" content="GB" />
+  <meta name="geo.placename" content="Leeds" />
+  <meta name="geo.position" content="53.8008;-1.5491" />
+  <meta name="ICBM" content="53.8008, -1.5491" />
 </head>
 <body>
 
@@ -1427,8 +1466,24 @@
     </div>
   </section>
 
+  <!-- ══ §9 — LATEST REPORTS & GUIDES ═══════════════════════════ -->
+  <section id="latest-reports" aria-labelledby="latest-reports-title">
+    <div class="container">
+      <div class="reports-header">
+        <span class="label">Priority Internal Links</span>
+        <h2 class="display" id="latest-reports-title">Latest Reports &amp; Guides</h2>
+      </div>
+      <div class="reports-grid">
+        <a class="report-link" href="benchmark-report.html">Benchmark Report</a>
+        <a class="report-link" href="cost-of-poor-intake.html">Cost of Poor Intake</a>
+        <a class="report-link" href="prequalify-without-risk.html">Pre‑Qualify Without Risk</a>
+        <a class="report-link" href="intake-automation-guide.html">Intake Automation Guide</a>
+      </div>
+    </div>
+  </section>
 
-  <!-- ══ §9 — FINAL CTA ═══════════════════════════════════════════ -->
+
+  <!-- ══ §10 — FINAL CTA ══════════════════════════════════════════ -->
   <section id="cta-final" aria-labelledby="cta-headline">
     <div class="container">
       <div class="cta-final-inner">
@@ -1499,6 +1554,7 @@
     </div>
 
   </div>
+  <p>AirCounsel — UK Immigration Intake Engineering (Leeds, United Kingdom)</p>
 </footer>
 
 
