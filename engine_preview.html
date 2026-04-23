@@ -619,6 +619,45 @@
       background: #02040a;
     }
 
+
+    .premium-compare {
+      margin-top: 1.35rem;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+    .compare-card {
+      border: 1px solid var(--border);
+      background: linear-gradient(160deg, rgba(12,22,36,0.86), rgba(12,18,30,0.5));
+      padding: 1.25rem 1.35rem;
+    }
+    .compare-card h3 {
+      font-family: var(--ff-display);
+      color: var(--text-bright);
+      font-size: 1.28rem;
+      line-height: 1.2;
+      margin-bottom: 0.45rem;
+      font-weight: 400;
+    }
+    .compare-card p {
+      font-size: 0.87rem;
+      color: var(--text-mid);
+      line-height: 1.65;
+      max-width: none;
+    }
+    .compare-kicker {
+      display: inline-block;
+      font-family: var(--ff-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      margin-bottom: 0.55rem;
+    }
+    .compare-card.premium { border-color: rgba(184,154,90,0.34); }
+    .compare-card.premium .compare-kicker { color: var(--gold-light); }
+    .compare-card.generic { border-color: var(--border-soft); }
+    .compare-card.generic .compare-kicker { color: var(--text-muted); }
+
     /* ─── SECTION: HOW IT WORKS ────────────────────────────────────── */
     #how-it-works {
       background: var(--navy);
@@ -1231,6 +1270,11 @@
 
       section { padding: 5rem 0; }
     }
+
+    @media (max-width: 860px) {
+      .premium-compare { grid-template-columns: 1fr; }
+    }
+
   </style>
 
   <meta name="geo.region" content="GB" />
@@ -1437,12 +1481,30 @@
 
       <!-- MICRO-ADJUSTMENT: Cinematic framing line -->
       <p class="cinematic-framing fade-up d1">
-        This cinematic preview is not the product — it is a visual explanation of how clarity forms inside your practice.
+        Live demo for partners and practice managers: compare a premium intelligence experience against a generic intake flow in the same frame.
       </p>
 
       <div class="video-wrapper fade-up d2" role="region" aria-label="Cinematic engine ad preview">
         <iframe
           class="video-engine-frame"
+          src="engine_merged.html"
+          title="AirCounsel premium vs generic engine showcase"
+          loading="lazy"
+          allow="autoplay"
+        ></iframe>
+      </div>
+
+      <div class="premium-compare fade-up d3" role="list" aria-label="Premium versus generic differentiation">
+        <article class="compare-card premium" role="listitem">
+          <span class="compare-kicker">Premium Intelligence Engine</span>
+          <h3>Context-rich, voiced, manager-ready.</h3>
+          <p>Adaptive routing, confidence-weighted recommendations, and executive visibility into intake quality in under 10 minutes.</p>
+        </article>
+        <article class="compare-card generic" role="listitem">
+          <span class="compare-kicker">Generic Intake Experience</span>
+          <h3>Static forms and fragmented follow-up.</h3>
+          <p>Collects data but leaves teams manually triaging risk, viability, and solicitor readiness after submission.</p>
+        </article>
           src="engine_ad.html"
           title="AirCounsel Engine ad"
           loading="lazy"
