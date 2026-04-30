@@ -487,6 +487,21 @@
       border: none;
       background: var(--cream);
     }
+    .linkedin-embed-wrap {
+      height: 100%;
+      min-height: 320px;
+      border: none;
+      background: var(--cream);
+      display: flex;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .linkedin-embed-wrap iframe {
+      width: min(100%, 504px);
+      min-height: 661px;
+      border: 0;
+      background: #fff;
+    }
 
     /* ─── PROBLEM ────────────────────────────────────────────────── */
     #problem {
@@ -1194,17 +1209,10 @@
         </p>
       </div>
 
-      <!-- Video placeholder — 12s pattern break clip -->
+      <!-- LinkedIn embedded post -->
       <div class="pattern-break-video fade-up delay-1">
-        <div class="video-placeholder">
-          <div class="video-placeholder-inner">
-            <div class="icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
-            </div>
-            <p>Pattern Break Video
-              <span>12-second clip — too many weak enquiries → clarity rising</span>
-            </p>
-          </div>
+        <div class="linkedin-embed-wrap">
+          <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7455543395059404800" height="661" width="504" frameborder="0" allowfullscreen="" title="Embedded LinkedIn post"></iframe>
         </div>
       </div>
 
