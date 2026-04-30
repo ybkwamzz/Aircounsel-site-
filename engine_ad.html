@@ -658,6 +658,7 @@
 
 
 <button class="voice-toggle" id="voiceToggle" aria-pressed="false">Voice: Off</button>
+<button class="voice-toggle" id="voiceToggle" aria-pressed="true">Voice: On</button>
 
 <!-- BG CANVAS -->
 <canvas id="bg"></canvas>
@@ -1009,6 +1010,11 @@ let narrationOn = false;
 let narrationRate = audioProfiles.balanced.rate;
 let narrationPitch = audioProfiles.balanced.pitch;
 let narrationVolume = audioProfiles.balanced.volume;
+let narrationOn = true;
+let narrationRate = audioProfiles.balanced.rate;
+let narrationPitch = audioProfiles.balanced.pitch;
+let narrationVolume = audioProfiles.balanced.volume;
+let narrationOn = true;
 
 function getNarrationVoice() {
   const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
@@ -1033,18 +1039,31 @@ function speakSceneLine(sceneNumber) {
   if (!narrationOn || !window.speechSynthesis || window.speechSynthesis.speaking) return;
   const line = narrationLines[sceneNumber];
   if (!line) return;
+  if (!narrationOn || !window.speechSynthesis) return;
+  const line = narrationLines[sceneNumber];
+  if (!line) return;
+  window.speechSynthesis.cancel();
   const utterance = new SpeechSynthesisUtterance(line);
   const chosenVoice = getNarrationVoice();
   if (chosenVoice) utterance.voice = chosenVoice;
   utterance.rate = narrationRate;
   utterance.pitch = narrationPitch;
   utterance.volume = narrationVolume;
+  utterance.rate = 0.95;
+  utterance.pitch = 0.92;
+  utterance.volume = 0.9;
   window.speechSynthesis.speak(utterance);
 }
 
 voiceToggle.addEventListener('click', () => {
   const next = narrationOn ? 'off' : 'balanced';
   applyAudioProfile(next);
+  narrationOn = !narrationOn;
+  voiceToggle.textContent = narrationOn ? 'Voice: On' : 'Voice: Off';
+  voiceToggle.setAttribute('aria-pressed', narrationOn ? 'true' : 'false');
+  if (!narrationOn && window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
 });
 
 if (window.speechSynthesis) {
@@ -1059,6 +1078,7 @@ window.addEventListener('message', (event) => {
 
 const initialAudio = new URLSearchParams(window.location.search).get('audio');
 applyAudioProfile((initialAudio || 'off').toLowerCase());
+applyAudioProfile((initialAudio || 'balanced').toLowerCase());
 
 // ─── SCENES ───
 const scenes = ['s0','s1','s2','s3','s4','s5'];
