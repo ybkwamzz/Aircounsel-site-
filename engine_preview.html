@@ -610,119 +610,53 @@
       overflow: hidden;
     }
 
-    /* Animated placeholder for engine video */
-    .video-placeholder-engine {
+    .video-engine-frame {
       position: absolute;
       inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1.5rem;
-      background: linear-gradient(160deg, #0d1b2a 0%, #162032 60%, #0d1b2a 100%);
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #02040a;
     }
 
-    /* Animated grid inside video */
-    .video-grid-bg {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(184,154,90,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(184,154,90,0.05) 1px, transparent 1px);
-      background-size: 60px 60px;
-      mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
-    }
 
-    .video-scan-line {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 1px;
-      background: linear-gradient(to right, transparent, var(--gold), transparent);
-      animation: scanDown 4s ease-in-out infinite;
-      opacity: 0.3;
+    .premium-compare {
+      margin-top: 1.35rem;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
     }
-
-    .video-center-content {
-      position: relative;
-      z-index: 1;
-      text-align: center;
+    .compare-card {
+      border: 1px solid var(--border);
+      background: linear-gradient(160deg, rgba(12,22,36,0.86), rgba(12,18,30,0.5));
+      padding: 1.25rem 1.35rem;
     }
-
-    .video-play-ring {
-      width: 72px; height: 72px;
-      border: 1px solid rgba(184,154,90,0.3);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1.5rem;
-      position: relative;
-    }
-    .video-play-ring::before {
-      content: '';
-      position: absolute;
-      inset: 6px;
-      border: 1px solid rgba(184,154,90,0.15);
-      border-radius: 50%;
-    }
-    .video-play-ring svg {
-      width: 22px; height: 22px;
-      fill: var(--gold);
-      margin-left: 3px;
-    }
-
-    .video-label-text {
-      font-size: 0.68rem;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-    .video-label-sub {
+    .compare-card h3 {
       font-family: var(--ff-display);
-      font-size: 0.9rem;
-      font-style: italic;
-      color: var(--text-ghost);
-      margin-top: 0.3rem;
+      color: var(--text-bright);
+      font-size: 1.28rem;
+      line-height: 1.2;
+      margin-bottom: 0.45rem;
+      font-weight: 400;
     }
-
-    /* Corner marks on video */
-    .video-corner {
-      position: absolute;
-      width: 14px; height: 14px;
-      border-color: rgba(184,154,90,0.25);
-      border-style: solid;
+    .compare-card p {
+      font-size: 0.87rem;
+      color: var(--text-mid);
+      line-height: 1.65;
+      max-width: none;
     }
-    .video-corner--tl { top: 12px; left: 12px; border-width: 1px 0 0 1px; }
-    .video-corner--tr { top: 12px; right: 12px; border-width: 1px 1px 0 0; }
-    .video-corner--bl { bottom: 12px; left: 12px; border-width: 0 0 1px 1px; }
-    .video-corner--br { bottom: 12px; right: 12px; border-width: 0 1px 1px 0; }
-
-    /* Data readout at bottom of video */
-    .video-readout {
-      position: absolute;
-      bottom: 1.5rem;
-      left: 1.5rem;
-      right: 1.5rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-    }
-    .readout-item {
-      text-align: left;
-    }
-    .readout-label {
+    .compare-kicker {
+      display: inline-block;
       font-family: var(--ff-mono);
-      font-size: 0.6rem;
-      color: rgba(184,154,90,0.35);
-      letter-spacing: 0.12em;
+      font-size: 0.66rem;
+      letter-spacing: 0.13em;
       text-transform: uppercase;
+      margin-bottom: 0.55rem;
     }
-    .readout-value {
-      font-family: var(--ff-mono);
-      font-size: 0.72rem;
-      color: rgba(184,154,90,0.55);
-      letter-spacing: 0.06em;
-    }
+    .compare-card.premium { border-color: rgba(184,154,90,0.34); }
+    .compare-card.premium .compare-kicker { color: var(--gold-light); }
+    .compare-card.generic { border-color: var(--border-soft); }
+    .compare-card.generic .compare-kicker { color: var(--text-muted); }
 
     /* ─── SECTION: HOW IT WORKS ────────────────────────────────────── */
     #how-it-works {
@@ -1336,6 +1270,11 @@
 
       section { padding: 5rem 0; }
     }
+
+    @media (max-width: 860px) {
+      .premium-compare { grid-template-columns: 1fr; }
+    }
+
   </style>
 
   <meta name="geo.region" content="GB" />
@@ -1542,47 +1481,20 @@
 
       <!-- MICRO-ADJUSTMENT: Cinematic framing line -->
       <p class="cinematic-framing fade-up d1">
-        This cinematic preview is not the product — it is a visual explanation of how clarity forms inside your practice.
+        Adaptive engine walkthrough for partners and managers. This is the diligence-first operating view used to evaluate viability, risk, and team readiness.
       </p>
 
-      <!-- Video placeholder — replace src with actual cinematic engine preview -->
-      <div class="video-wrapper fade-up d2" role="img" aria-label="Cinematic engine preview video placeholder">
-
-        <div class="video-placeholder-engine">
-          <div class="video-grid-bg" aria-hidden="true"></div>
-          <div class="video-scan-line" aria-hidden="true"></div>
-
-          <div class="video-corner video-corner--tl" aria-hidden="true"></div>
-          <div class="video-corner video-corner--tr" aria-hidden="true"></div>
-          <div class="video-corner video-corner--bl" aria-hidden="true"></div>
-          <div class="video-corner video-corner--br" aria-hidden="true"></div>
-
-          <div class="video-center-content">
-            <div class="video-play-ring" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
-            </div>
-            <p class="video-label-text">Cinematic Engine Preview</p>
-            <p class="video-label-sub">Replace with actual video — autoplay · muted · loop</p>
-          </div>
-
-          <div class="video-readout" aria-hidden="true">
-            <div class="readout-item">
-              <div class="readout-label">System</div>
-              <div class="readout-value">AC-ENGINE-L1</div>
-            </div>
-            <div class="readout-item" style="text-align:center;">
-              <div class="readout-label">Status</div>
-              <div class="readout-value">Active · Leeds</div>
-            </div>
-            <div class="readout-item" style="text-align:right;">
-              <div class="readout-label">Layer</div>
-              <div class="readout-value">01 of 03</div>
-            </div>
-          </div>
-
-        </div>
-
+      <div class="video-wrapper fade-up d2" role="region" aria-label="Cinematic engine ad preview">
+        <iframe
+          class="video-engine-frame"
+          src="engine_adaptive.html"
+          title="AirCounsel adaptive engine preview"
+          loading="lazy"
+          allow="autoplay"
+        ></iframe>
       </div>
+
+      
 
     </div>
   </section>
