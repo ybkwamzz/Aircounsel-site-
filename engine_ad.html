@@ -657,6 +657,7 @@
 </div>
 
 
+<button class="voice-toggle" id="voiceToggle" aria-pressed="false">Voice: Off</button>
 <button class="voice-toggle" id="voiceToggle" aria-pressed="true">Voice: On</button>
 
 <!-- BG CANVAS -->
@@ -1005,6 +1006,10 @@ const audioProfiles = {
   cinematic: { narrationOn: true, rate: 0.88, pitch: 0.82, volume: 1 }
 };
 let audioProfile = 'balanced';
+let narrationOn = false;
+let narrationRate = audioProfiles.balanced.rate;
+let narrationPitch = audioProfiles.balanced.pitch;
+let narrationVolume = audioProfiles.balanced.volume;
 let narrationOn = true;
 let narrationRate = audioProfiles.balanced.rate;
 let narrationPitch = audioProfiles.balanced.pitch;
@@ -1031,6 +1036,9 @@ function applyAudioProfile(profileName) {
 }
 
 function speakSceneLine(sceneNumber) {
+  if (!narrationOn || !window.speechSynthesis || window.speechSynthesis.speaking) return;
+  const line = narrationLines[sceneNumber];
+  if (!line) return;
   if (!narrationOn || !window.speechSynthesis) return;
   const line = narrationLines[sceneNumber];
   if (!line) return;
@@ -1069,6 +1077,7 @@ window.addEventListener('message', (event) => {
 });
 
 const initialAudio = new URLSearchParams(window.location.search).get('audio');
+applyAudioProfile((initialAudio || 'off').toLowerCase());
 applyAudioProfile((initialAudio || 'balanced').toLowerCase());
 
 // ─── SCENES ───
